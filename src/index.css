@@ -1,0 +1,10 @@
+@import "https://js.arcgis.com/4.26/@arcgis/core/assets/esri/themes/dark/main.css";
+html, #root, .App {
+  height: 100%;
+  width: 100%;
+  overflow-x: hidden;
+
+
+}
+
+

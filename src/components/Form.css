@@ -1,0 +1,49 @@
+form, .formDiv {
+    height: 100%;
+}
+
+ .esri-view {
+    height: 60vh;
+    width: 100%;
+    margin-bottom: 1em !important;
+}
+calcite-card {
+    margin-bottom: 1em;
+}
+
+calcite-input-message {
+    color: var(--calcite-ui-danger);
+}
+
+.custom-file-upload {
+    height: 44px;
+    width: 116px;
+    z-index: 0;
+    position: absolute;
+    left: 0;
+
+}
+
+input[type="file"] {
+    display: none;
+  }
+
+  .upload {
+    margin-bottom: 1em;
+
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .file-name {
+    margin-top: 2em;
+    margin-left: 2em;
+  }
+
+  calcite-notice {
+    margin-left: 0;
+    margin-bottom: 2em;
+  }

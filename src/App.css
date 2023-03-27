@@ -1,0 +1,23 @@
+#root {
+  --calcite-ui-brand: #4d8c2b;
+  --calcite-ui-brand-hover: #4d8c2b;
+  --calcite-ui-brand-press: #4d8c2b;
+}
+
+body {
+  background-color: var(--calcite-ui-foreground-1);
+}
+
+#logo {
+  height: 50px;
+  margin-bottom: 1em;
+  margin-right: 2em;
+}
+#header {
+  display: flex;
+  color: var(--calcite-ui-text-2);
+}
+
+#header h2 {
+  margin-top: 10px;
+}
