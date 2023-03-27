@@ -248,6 +248,7 @@ function Form() {
                 {f.alias}
                 <CalciteInput
                   scale="l"
+                  clearable
                   maxLength={f.length}
                   type={f.name.includes("email") ? "email" : "text"}
                   name={f.name}
@@ -317,6 +318,7 @@ function Form() {
                 {f.alias}
                 <CalciteInput
                   scale="l"
+                  clearable
                   name={f.name}
                   maxLength={f.length}
                   min={
@@ -422,6 +424,7 @@ function Form() {
                     Street Name
                     <CalciteInput
                       scale="l"
+                      clearable
                       maxLength={20}
                       onCalciteInputChange={(e) => {
                         streetNameChanged(e, i);
