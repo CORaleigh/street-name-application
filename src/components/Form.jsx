@@ -52,14 +52,24 @@ function Form() {
       code: null,
     },
   ]);
-  const stepped = async (e) => {
+  const stepped = async (step) => {
     if (!mapLoaded) {
       await loadMap(mapRef.current, setLocation);
       setMapLoaded(true);
     }
-    if (e.target.selectedItem) {
-      setSelectedStep(e.target.selectedItem.heading);
+    setSelectedStep(step);
+    
+    if (step === 'Street Names') {
+      customElements.whenDefined('calcite-input-message').then(async _ => {
+        document.querySelectorAll('calcite-stepper-item[selected] calcite-input-message').forEach(message => {
+          var style = document.createElement( 'style' )
+          style.innerHTML = ':host([status="valid"]) .calcite-input-message-icon {color: var(--calcite-ui-warning) !important;}';
+          message.shadowRoot.appendChild( style )
+        })
+
+      });
     }
+  
   };
 
   const updateStreets = (e) => {
@@ -104,10 +114,10 @@ function Form() {
       }
       return field;
     });
-    console.log(updateFields)
     setFields(updateFields);
   };
   const streetNameChanged = async (e, i) => {
+  
     const result = await checkStreetNames(e.target.value, streetTypes);
     const newStreets = streets.map((street, index) => {
       if (index === i) {
@@ -237,7 +247,7 @@ function Form() {
     <div className="formDiv">
       {contactFields.length === 0 && <CalciteScrim loading></CalciteScrim>}
       {contactFields.length > 0 && (
-        <CalciteStepper scale="s" onCalciteStepperItemChange={stepped}>
+        <CalciteStepper scale="s" onCalciteStepperItemChange={(e) => {stepped(e.target.selectedItem.heading)}}>
           <CalciteStepperItem
             selected={selectedStep === "Contact Info" ? true : undefined}
             ref={contactStep}
@@ -279,7 +289,7 @@ function Form() {
               }
               onClick={(e) => {
                 setSelectedStep("Project Location");
-                stepped(e);
+                stepped("Project Location");
               }}
             >
               Next
@@ -315,6 +325,7 @@ function Form() {
           >
             {appFields.map((f, i) => (
               <CalciteLabel scale="l" key={f.name}>
+               
                 {f.alias}
                 <CalciteInput
                   scale="l"
@@ -343,6 +354,7 @@ function Form() {
                   }}
                   status={f.valid ? "valid" : "invalid"}
                 ></CalciteInput>
+               
                 {!f.valid && (
                   <CalciteInputMessage
                     scale="l"
@@ -351,14 +363,15 @@ function Form() {
                     {f.reason}
                   </CalciteInputMessage>
                 )}
-              </CalciteLabel>
-            ))}
-            <CalciteNotice open icon="information">
+                         { f.name === 'streetnamessubmitting' &&  streetsSubmitting === streetsNeeded && <CalciteNotice open kind="warning" icon="information">
               <div slot="message">
-                Recommend submitting more than needed, in case there are
+                Recommend submitting more street names than needed, in case there are
                 unapproveable street names.
               </div>
-            </CalciteNotice>
+            </CalciteNotice>}     
+              </CalciteLabel>
+            ))}
+
             <CalciteLabel scale="l">
               Site Plan
             <form ref={attachments}>
@@ -400,7 +413,7 @@ function Form() {
               }
               onClick={(e) => {
                 setSelectedStep("Street Names");
-                stepped(e);
+                stepped("Street Names");
               }}
             >
               Next
@@ -433,14 +446,15 @@ function Form() {
                       value={street.name.value}
                       status={street.name.valid ? "valid" : "invalid"}
                     ></CalciteInput>
-                    {street.name.valid === false && (
+                    
                       <CalciteInputMessage
-                        scale="l"
+                        scale="l"                    
+                        icon={!street.name.valid ? 'x-octagon-f' : street.name.valid && street.name.reason ? 'exclamation-mark-triangle-f' : undefined }
                         status={street.name.valid ? "valid" : "invalid"}
                       >
                         {street.name.reason}
                       </CalciteInputMessage>
-                    )}
+              
                   </CalciteLabel>
                   {street.type && (
                     <CalciteLabel scale="l">
@@ -459,6 +473,7 @@ function Form() {
                       </CalciteSelect>
                       {street.type.valid === false && (
                         <CalciteInputMessage
+
                           scale="l"
                           status={street.type.valid ? "valid" : "invalid"}
                         >
@@ -470,7 +485,6 @@ function Form() {
                 </CalciteCard>
               );
             })}
-            <h1>{JSON.stringify(streets)}</h1>
             {streets.length && (
               <CalciteButton
                 scale="l"

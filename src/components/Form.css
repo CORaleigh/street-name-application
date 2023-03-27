@@ -11,10 +11,12 @@ calcite-card {
     margin-bottom: 1em;
 }
 
-calcite-input-message {
+calcite-input-message[status='invalid'] {
     color: var(--calcite-ui-danger);
 }
-
+calcite-input-message[status='valid'] {
+  color: var(--calcite-ui-warning);
+}
 .custom-file-upload {
     height: 44px;
     width: 116px;

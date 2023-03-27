@@ -217,34 +217,47 @@ export const checkStreetNames = async (value, streetTypes) => {
   if (containsNumber) {
     return { valid: false, reason: "Street name cannot contain a number" };
   }
-  const where = `ST_NAME = '${streetName}' or ST_NAME = '${streetName.replace(
-    " ",
-    ""
-  )}%'`;
-  const result = await streetNameDirectory.queryFeatures({
-    where: where,
-    outFields: ["*"],
-  });
-  if (result.features.length) {
+  // const where = `ST_NAME = '${streetName}' or ST_NAME = '${streetName.replace(
+  //   " ",
+  //   ""
+  // )}%'`;
+  // const result = await streetNameDirectory.queryFeatures({
+  //   where: where,
+  //   outFields: ["*"],
+  // });
+  // if (result.features.length) {
+  //   return { valid: false, reason: "Street name is already in use" };
+  // }
+  if (streetNames.find(name => {
+    return name.replace(' ', '') === streetName.replace(' ','');
+  })) {
     return { valid: false, reason: "Street name is already in use" };
-  }
-  let soundsLike = null;
-  streetNames.forEach((name) => {
-    // if (levenshteinEditDistance(name, streetName) < 3) {
-    //     soundsLike = name;
-    // }
 
-    if (compareTwoStrings(name, streetName) >= 0.7) {
-      if (compareTwoStrings(name, streetName) >= 0.75) {
-        soundsLike = name;
-      }
-      console.log(name, compareTwoStrings(name, streetName));
-    }
-  });
-  if (soundsLike) {
-    return { valid: false, reason: "Sounds too similar to " + soundsLike };
   }
-  return { valid: true, reason: "" };
+  let soundsLike = { valid: true, reason: "" };
+  console.clear();
+
+  for (let i = 0; i < streetNames.length; i++) {
+      const name = streetNames[i];
+      if (compareTwoStrings(name, streetName) >= 0.7) {
+        if (compareTwoStrings(name, streetName) >= 0.75) {
+          //soundsLike = name;
+        }
+        console.log(name, compareTwoStrings(name, streetName));
+      }      
+
+      if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 1) {
+        soundsLike = { valid: false, reason: "Sounds too similar to " + name };
+        break;
+      }
+      if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 2) {
+        soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
+        break;
+      }
+
+  };
+
+  return soundsLike;
 };
 
 export const validateEmail = (email) => {
