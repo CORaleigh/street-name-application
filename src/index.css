@@ -8,3 +8,6 @@ html, #root, .App {
 }
 
 
+Intro li {
+  font-size: 16px;
+}

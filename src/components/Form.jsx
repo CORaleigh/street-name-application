@@ -13,6 +13,7 @@ import {
   CalciteModal,
 } from "@esri/calcite-components-react";
 import { useEffect, useRef, useState } from "react";
+import Intro from "../Intro";
 import "./Form.css";
 import {
   getFields,
@@ -30,7 +31,7 @@ function Form() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [streetsSubmitting, setStreetsSubmitting] = useState(1);
   const [streetsNeeded, setStreetsNeeded] = useState(1);
-  const [selectedStep, setSelectedStep] = useState("Contact Info");
+  const [selectedStep, setSelectedStep] = useState("Instructions");
   const contactStep = useRef(null);
   const locationStep = useRef(null);
   const detailsStep = useRef(null);
@@ -38,6 +39,8 @@ function Form() {
   const [success, setSuccess] = useState(false);
   const [location, setLocation] = useState(undefined);
   const [files, setFiles] = useState([{}]);
+  const [agree, setAgree] = useState(false);
+  const [appWidth, setAppWidth] = useState(window.innerWidth);
   const attachments = useRef(null);
 
   const [streets, setStreets] = useState([
@@ -53,12 +56,16 @@ function Form() {
     },
   ]);
   const stepped = async (step) => {
-    if (!mapLoaded) {
+    debugger
+
+    if (!mapLoaded && step === 'Project Location') {
       await loadMap(mapRef.current, setLocation);
       setMapLoaded(true);
     }
     setSelectedStep(step);
-    
+    if (step === 'Instructions') {
+      setAgree(false);
+    }
     if (step === 'Street Names') {
       customElements.whenDefined('calcite-input-message').then(async _ => {
         document.querySelectorAll('calcite-stepper-item[selected] calcite-input-message').forEach(message => {
@@ -177,6 +184,7 @@ function Form() {
   };
 
   useEffect(() => {
+    window.addEventListener('resize', _ => setAppWidth(window.innerWidth)) ;
     (async () => {
       const fields = await getFields("155f0425df84404eb3a9b67cfcbece15");
       fields.forEach((f) => {
@@ -247,10 +255,31 @@ function Form() {
     <div className="formDiv">
       {contactFields.length === 0 && <CalciteScrim loading></CalciteScrim>}
       {contactFields.length > 0 && (
-        <CalciteStepper scale="s" onCalciteStepperItemChange={(e) => {stepped(e.target.selectedItem.heading)}}>
+        <CalciteStepper layout={appWidth <= 600 ? 'vertical' : 'horizontal'} scale="s" onCalciteStepperItemChange={(e) => {stepped(e.target.selectedItem.heading)}}>
+                    <CalciteStepperItem
+            selected={selectedStep === "Instructions" ? true : undefined}
+            ref={contactStep}
+            heading="Instructions"
+          >
+
+            <Intro id="intro"></Intro>
+            <CalciteButton
+              scale="l"
+
+              onClick={(e) => {
+                setSelectedStep("Contact Info");
+                stepped("Contact Info");
+                setAgree(true);
+              }}
+            >
+              I Agree
+            </CalciteButton>
+
+          </CalciteStepperItem>
           <CalciteStepperItem
             selected={selectedStep === "Contact Info" ? true : undefined}
             ref={contactStep}
+            disabled={agree ? undefined : true}            
             heading="Contact Info"
           >
             {contactFields.map((f, i) => (
@@ -365,7 +394,7 @@ function Form() {
                 )}
                          { f.name === 'streetnamessubmitting' &&  streetsSubmitting === streetsNeeded && <CalciteNotice open kind="warning" icon="information">
               <div slot="message">
-                Recommend submitting more street names than needed, in case there are
+                Recommend submitting a few more street names than needed, in case there are
                 unapproveable street names.
               </div>
             </CalciteNotice>}     

@@ -189,7 +189,7 @@ export const checkStreetNames = async (value, streetTypes) => {
   }
   let containsType = false;
   types.forEach((type) => {
-    if (streetName.includes(type)) {
+    if (streetName.includes(' ' + type) || streetName.includes(type + ' ')) {
       containsType = true;
     }
   });
@@ -198,7 +198,7 @@ export const checkStreetNames = async (value, streetTypes) => {
   }
   let containsDirection = false;
   directions.forEach((direction) => {
-    if (streetName.includes(' '+direction)) {
+    if (streetName.includes(' '+direction) || streetName.includes(direction + ' ')) {
       containsDirection = true;
     }
   });

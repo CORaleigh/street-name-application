@@ -1,5 +1,6 @@
 form, .formDiv {
     height: 100%;
+    margin: 1em;
 }
 
  .esri-view {
@@ -48,4 +49,12 @@ input[type="file"] {
   calcite-notice {
     margin-left: 0;
     margin-bottom: 2em;
+  }
+
+  calcite-stepper-item {
+    width: 100%;
+  }
+
+.intro {
+    font-size: 14px !important;
   }
