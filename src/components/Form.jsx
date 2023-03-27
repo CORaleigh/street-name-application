@@ -424,11 +424,12 @@ function Form() {
                     Street Name
                     <CalciteInput
                       scale="l"
-                      clearable
                       maxLength={20}
                       onCalciteInputChange={(e) => {
+                        e.target.setAttribute('clearable', true);
                         streetNameChanged(e, i);
                       }}
+                      onCalciteInputInput={e => e.target.setAttribute('clearable', true)}
                       value={street.name.value}
                       status={street.name.valid ? "valid" : "invalid"}
                     ></CalciteInput>
