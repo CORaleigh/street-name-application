@@ -92,6 +92,23 @@ const directions = [
 
 export const getFields = async (id) => {
   await appLayer.load();
+  appLayer.fields.forEach((f) => {
+    f.valid = f.nullable ? true : false;
+    f.reason = f.nullable ? null : "Required";
+    f.value = "";
+    if (f.name.includes("email")) {
+      f.placeholder = "user@domain.com";
+    }
+    if (f.name.includes("phone")) {
+      f.placeholder = "999-999-9999";
+    }
+    if (f.name === "contact") {
+      f.placeholder = "First Last";
+    }
+    if (f.name === 'streetnamessubmitting' || f.name === 'streetnamesneeded') {
+      f.value = '1';
+    }
+  });  
   return appLayer.fields;
 };
 
@@ -246,14 +263,22 @@ export const checkStreetNames = async (value, streetTypes) => {
         console.log(name, compareTwoStrings(name, streetName));
       }      
 
-      if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 1) {
+      // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 1) {
+      //   soundsLike = { valid: false, reason: "Sounds too similar to " + name };
+      //   break;
+      // }
+      // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 2) {
+      //   if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) > 0.75) {
+      //     soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
+      //   }
+      // }
+      if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) >= 0.8) {
         soundsLike = { valid: false, reason: "Sounds too similar to " + name };
         break;
       }
-      if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 2) {
+      if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) >= 0.70) {
         soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
-        break;
-      }
+      }      
 
   };
 

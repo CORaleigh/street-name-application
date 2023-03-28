@@ -12,7 +12,9 @@ import {
   CalciteNotice,
   CalciteModal,
 } from "@esri/calcite-components-react";
+
 import { useEffect, useRef, useState } from "react";
+import useStreets from "./utils/useStreets";
 import Intro from "../Intro";
 import "./Form.css";
 import {
@@ -24,7 +26,7 @@ import {
   getStreetTypes,
   submitApplication,
 } from "./utils/form";
-function Form() {
+function Form(props) {
   const [appFields, setAppFields] = useState([]);
   const [contactFields, setContactFields] = useState([]);
   const mapRef = useRef(null);
@@ -43,20 +45,9 @@ function Form() {
   const [appWidth, setAppWidth] = useState(window.innerWidth);
   const attachments = useRef(null);
 
-  const [streets, setStreets] = useState([
-    {
-      name: { value: null, valid: false, reason: "Street name required" },
-      type: { value: null, valid: false, reason: "Street type required" },
-    },
-  ]);
-  const [streetTypes, setStreetTypes] = useState([
-    {
-      name: "Select street type...",
-      code: null,
-    },
-  ]);
+  const {updateStreets, streets, streetTypes, streetNameChanged, streetTypeChanged} = useStreets(props);
+
   const stepped = async (step) => {
-    debugger
 
     if (!mapLoaded && step === 'Project Location') {
       await loadMap(mapRef.current, setLocation);
@@ -76,27 +67,11 @@ function Form() {
 
       });
     }
-  
   };
 
-  const updateStreets = (e) => {
-    if (e.target.value < streetsSubmitting) {
-      setStreets(streets.slice(0, -1));
-    } else {
-      const addStreets = [];
-      for (let i = streets.length; i < parseInt(e.target.value); i++) {
-        addStreets.push({
-          name: { value: null, valid: false, reason: "Street name required" },
-          type: { value: null, valid: false, reason: "Street type required" },
-        });
-      }
-      setStreets([...streets, ...addStreets]);
-    }
-
-    setStreetsSubmitting(parseInt(e.target.value));
-  };
   const inputChanged = (e, i, fields, setFields) => {
     if (e.target.name === "streetnamessubmitting") {
+      setStreetsSubmitting(parseInt(e.target.value));
       updateStreets(e);
     }
     if (e.target.name === "streetnamesneeded") {
@@ -123,38 +98,7 @@ function Form() {
     });
     setFields(updateFields);
   };
-  const streetNameChanged = async (e, i) => {
   
-    const result = await checkStreetNames(e.target.value, streetTypes);
-    const newStreets = streets.map((street, index) => {
-      if (index === i) {
-        street.name = {
-          value: e.target.value,
-          valid: result.valid,
-          reason: result.reason,
-        };
-      }
-      return street;
-    });
-    setStreets(newStreets);
-  };
-  const streetTypeChanged = async (e, i) => {
-    let result = { valid: true, reason: null };
-    if (!e.target.selectedOption.value) {
-      result = { valid: false, reason: "Street type required" };
-    }
-    const newStreets = streets.map((street, index) => {
-      if (index === i) {
-        street.type = {
-          value: e.target.selectedOption.value,
-          valid: result.valid,
-          reason: result.reason,
-        };
-      }
-      return street;
-    });
-    setStreets(newStreets);
-  };
 
   const fileChanged = (e, i) => {
     var file = e.target.files[0];
@@ -165,45 +109,13 @@ function Form() {
       return f;
     });
     setFiles(newfiles);
-    //setFiles([...files.slice(0, i), {...files[i]}]);
-    // setFiles([...[...files.slice(0, i), {...files[i]}], ...[{name: `File ${(i + 1).toString()}`}]]);
-    // if (file == undefined) return;
-    // var reader = new FileReader();
-    // reader.onload = function (event) {
-    //   const reader_image = event.target.result;
-    //   const image = new Image();
-    //   image.onload = (e) => {
-    //     setFiles([...photos.slice(0, i), {...photos[i], src: reader_image, height: e.target.height, width: e.target.width}]);
 
-    //     //setPhotos([...[...photos.slice(0, i), {...photos[i], src: reader_image, height: e.target.height, width: e.target.width}], ...[{name: `Photo ${(i + 1).toString()}`, src: '', height: 0, width: 0}]]);
-
-    //   };
-    //   image.src = reader_image;
-    //   };
-    // reader.readAsDataURL(file);
   };
 
   useEffect(() => {
     window.addEventListener('resize', _ => setAppWidth(window.innerWidth)) ;
     (async () => {
       const fields = await getFields("155f0425df84404eb3a9b67cfcbece15");
-      fields.forEach((f) => {
-        f.valid = f.nullable ? true : false;
-        f.reason = f.nullable ? null : "Required";
-        f.value = "";
-        if (f.name.includes("email")) {
-          f.placeholder = "user@domain.com";
-        }
-        if (f.name.includes("phone")) {
-          f.placeholder = "999-999-9999";
-        }
-        if (f.name === "contact") {
-          f.placeholder = "First Last";
-        }
-        if (f.name === 'streetnamessubmitting' || f.name === 'streetnamesneeded') {
-          f.value = '1';
-        }
-      });
       setContactFields(
         fields.filter((f) =>
           ["contact", "organization", "email", "phone"].includes(f.name)
@@ -222,7 +134,6 @@ function Form() {
           ].includes(f.name)
         )
       );
-      setStreetTypes([...streetTypes, ...(await getStreetTypes())]);
     })();
   }, []);
   useEffect(() => {
@@ -379,8 +290,13 @@ function Form() {
                   }
                   type={f.name.includes("streetnames") ? "number" : "text"}
                   onCalciteInputInput={(e) => {
-                    inputChanged(e, i, appFields, setAppFields);
+                    if (!f.name.includes("streetnames")) {
+                      inputChanged(e, i, appFields, setAppFields);
+                    }
                   }}
+                  onCalciteInputChange={(e) => {
+                    inputChanged(e, i, appFields, setAppFields);
+                  }}                  
                   status={f.valid ? "valid" : "invalid"}
                 ></CalciteInput>
                
@@ -514,6 +430,7 @@ function Form() {
                 </CalciteCard>
               );
             })}
+            {JSON.stringify(streets)}
             {streets.length && (
               <CalciteButton
                 scale="l"
