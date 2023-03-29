@@ -2,7 +2,7 @@ function Intro() {
   return (
     <div className="intro">
       <h3>GUIDELINES FOR SELECTING STREET NAMES</h3>
-      <strong>Submitting this application does not mean all of the streets will be approved.  City and County staff will further review the streets and reach out if more streets are needed.</strong>
+      <strong>Submitting this application does not mean all of the streets will be approved.  City and County staff will further review the streets and reach out if more streets are needed or if changes need to be made.</strong>
       <br/>
       <p>
         City and County staff will determine whether the names submitted in this
