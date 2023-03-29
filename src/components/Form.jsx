@@ -39,6 +39,8 @@ function Form(props) {
   const detailsStep = useRef(null);
   const streetsStep = useRef(null);
   const [success, setSuccess] = useState(false);
+  const [locationSuccess, setLocationSuccess] = useState({valid: false, reason: 'Location not set, search by address in the upper right corner of the map'});
+
   const [location, setLocation] = useState(undefined);
   const [files, setFiles] = useState([{}]);
   const [agree, setAgree] = useState(false);
@@ -50,7 +52,7 @@ function Form(props) {
   const stepped = async (step) => {
 
     if (!mapLoaded && step === 'Project Location') {
-      await loadMap(mapRef.current, setLocation);
+      await loadMap(mapRef.current, setLocation, setLocationSuccess);
       setMapLoaded(true);
     }
     setSelectedStep(step);
@@ -140,17 +142,17 @@ function Form(props) {
     const updateFields = appFields.map((field, index) => {
       let result = { valid: true, reason: null };
       if (field.name.toLowerCase().includes("address")) {
-        field.value = location.getAttribute("SITE_ADDRESS");
+        field.value = location !== undefined ? location.getAttribute("address") : null;
         field.valid = result.valid;
         field.reason = result.reason;
       }
       if (field.name.toLowerCase().includes("zip")) {
-        field.value = location.getAttribute("Postal");
+        field.value = location !== undefined ? location.getAttribute("Postal") : null;
         field.valid = result.valid;
         field.reason = result.reason;
       }
       if (field.name.toLowerCase() === "pinnum") {
-        field.value = location.getAttribute("PIN_NUM");
+        field.value = location !== undefined ? location.getAttribute("pinnum") : null
         field.valid = result.valid;
         field.reason = result.reason;
       }
@@ -246,6 +248,12 @@ function Form(props) {
                 : undefined
             }
           >
+            <CalciteNotice open kind={locationSuccess.valid ? 'success' : 'danger'}
+            icon={locationSuccess.valid ? 'check-circle-f' : 'x-octagon-f'}>
+            <div slot="message">
+              {locationSuccess.reason}    
+            </div>
+            </CalciteNotice>
             <div ref={mapRef}></div>
             <CalciteButton
               scale="l"
@@ -430,7 +438,6 @@ function Form(props) {
                 </CalciteCard>
               );
             })}
-            {JSON.stringify(streets)}
             {streets.length && (
               <CalciteButton
                 scale="l"

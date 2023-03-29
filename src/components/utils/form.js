@@ -9,6 +9,7 @@ import { doubleMetaphone } from "double-metaphone";
 import { levenshteinEditDistance } from "levenshtein-edit-distance";
 import { compareTwoStrings } from "string-similarity";
 import { stemmer } from "stemmer";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 
 let streetNames = [];
 const streetNameDirectory = new FeatureLayer({
@@ -112,35 +113,32 @@ export const getFields = async (id) => {
   return appLayer.fields;
 };
 
-export const loadMap = async (container, setLocation) => {
+export const loadMap = async (container, setLocation, setLocationSuccess) => {
   const map = new Map({
     basemap: {
       portalItem: {
         id: "109c9fa256a44e28a29a528ca18637e0",
       },
-    },
+    }
   });
   const view = new MapView({
     map: map,
     container: container,
+    zoom: 10,
+    center: [-78.6382, 35.7796]
   });
+  parcelsLayer.outFields = ['PIN_NUM', 'SITE_ADDRESS'];
   view.map.add(parcelsLayer);
   const search = new Search({
     view: view,
     includeDefaultSources: false,
     sources: [
-        {
-            layer: parcelsLayer,
-            searchFields: ["SITE_ADDRESS", "PIN_NUM"],
-            displayField: "SITE_ADDRESS",
-            exactMatch: false,
-            outFields: ["*"],
-            name: "Property search",
-            placeholder: "Search by address or PIN",
-            maxResults: 6,
-            maxSuggestions: 6,
-            suggestionsEnabled: true,
-            minSuggestCharacters: 0
+          {
+            url: 'https://maps.raleighnc.gov/arcgis/rest/services/Locators/Locator/GeocodeServer',
+            singleLineFieldName: 'SingleLine',
+            outFields: ['*'],
+            placeholder: 'Search by address',
+            zoomScale: 4800
           }
     ]
   });
@@ -153,18 +151,55 @@ export const loadMap = async (container, setLocation) => {
   search.on("search-complete", async (e) => {
     let feature = null;
 
-            feature = e.results[0].results[0]?.feature;
+    feature = e.results[0].results[0]?.feature;
 
  
+    let success = {valid: false, reason: `Location not set, search by address in the upper right corner of the map`};
 
     try {
-        feature.setAttribute('Postal', await getZip(feature));
-        setLocation(e.results[0].results[0].feature);
+        await reactiveUtils.whenOnce(_ => view.updating === true);
+        await reactiveUtils.whenOnce(_ => view.updating === false);
+        success =  await checkJurisdiction(feature.geometry);
+        if (success.valid) {
+          feature.setAttribute('Postal', feature.attributes['Postal']);
+          feature.setAttribute('address', feature.attributes['ShortLabel']);
+          const hitTest = await view.hitTest(view.toScreen(feature.geometry), {include: [parcelsLayer]});
+          debugger
+          if (hitTest.results.length) {
+            feature.setAttribute('pinnum', hitTest.results[0].graphic.attributes['PIN_NUM']);
+            success = {valid: true, reason: `Location set to ${feature.attributes['address']}`};
+  
+            setLocation(feature);          
+          } else {
+            success = {valid: false, reason: 'Address not located on a property'};
+          }
+
+
+        } else {
+          setLocation(undefined);
+        }
+
     } catch (reason) {
-        console.log('Location not set', reason)
+        setLocation(undefined);
+        console.log(success)
+    } finally {
+      setLocationSuccess(success)
+
     }
   });
 };
+export const checkJurisdiction = async (geometry) => {
+  const layer = new FeatureLayer({url: 'https://maps.wakegov.com/arcgis/rest/services/Jurisdictions/Jurisdictions/MapServer/1'});
+  await layer.load();
+  const result = await layer.queryFeatures({geometry: geometry, outFields:['JURISDICTION'], returnGeometry: false});
+  if (!result.features.length) {
+    return {valid: false, reason: 'Property not located inside the City of Raleigh, please submit through Wake County'};
+  }
+  if (result.features[0].getAttribute('JURISDICTION') !== 'RALEIGH') {
+    return {valid: false, reason: `Property is located in ${result.features[0].getAttribute('JURISDICTION')} please check their website`}; 
+  }
+  return {valid: true, reason: `Property located in City of Raleigh's jurisdiction`};
+}
 export const getZip = async (feature) => {
     const zipLayer = new FeatureLayer({portalItem: {
         id: '41fcd86f6b0c459ebdc576763a9145cf',
