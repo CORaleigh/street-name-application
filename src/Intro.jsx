@@ -2,14 +2,15 @@ function Intro() {
   return (
     <div className="intro">
       <h3>GUIDELINES FOR SELECTING STREET NAMES</h3>
-
+      <strong>Submitting this application does not mean all of the streets will be approved.  City and County staff will further review the streets and reach out if more streets are needed.</strong>
+      <br/>
       <p>
         City and County staff will determine whether the names submitted in this
         application are acceptable. Please consider the following guidelines
         when selecting your possible road names:
       </p>
       <ol>
-        <li>An Individual person’s name is not allowed</li>
+        <li>An Individual person's name is not allowed</li>
         <li>
           Directionals and numbers are not allowed e.g. North Star Ln; Four
           Corners Dr
@@ -88,7 +89,9 @@ function Intro() {
           parallel to, two streets.
         </li>
       </ol>
-      Have you read and agree to the above guidlines?
+
+      <strong>Have you read and agree to the above guidlines?</strong>
+      <br/><br/>
     </div>
   );
 }
