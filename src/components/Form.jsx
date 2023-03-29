@@ -11,11 +11,13 @@ import {
   CalciteScrim,
   CalciteNotice,
   CalciteModal,
+  CalciteLink,
+  CalciteIcon,
 } from "@esri/calcite-components-react";
 
 import { useEffect, useRef, useState } from "react";
 import useStreets from "./utils/useStreets";
-import Intro from "../Intro";
+import Intro from "./Intro";
 import "./Form.css";
 import {
   getFields,
@@ -26,6 +28,8 @@ import {
   getStreetTypes,
   submitApplication,
 } from "./utils/form";
+import StreetTypeList from "./StreetTypeList";
+import StreetNameRules from "./StreetNameRules";
 function Form(props) {
   const [appFields, setAppFields] = useState([]);
   const [contactFields, setContactFields] = useState([]);
@@ -39,7 +43,14 @@ function Form(props) {
   const detailsStep = useRef(null);
   const streetsStep = useRef(null);
   const [success, setSuccess] = useState(false);
-  const [locationSuccess, setLocationSuccess] = useState({valid: false, reason: 'Location not set, search by address in the upper right corner of the map'});
+  const [locationSuccess, setLocationSuccess] = useState({
+    valid: false,
+    reason:
+      "Location not set, search by address in the upper right corner of the map",
+  });
+
+  const [showStreetTypes, setShowStreetTypes] = useState(false);
+  const [showStreetNameRules, setShowStreetNameRules] = useState(false);
 
   const [location, setLocation] = useState(undefined);
   const [files, setFiles] = useState([{}]);
@@ -47,26 +58,35 @@ function Form(props) {
   const [appWidth, setAppWidth] = useState(window.innerWidth);
   const attachments = useRef(null);
 
-  const {updateStreets, streets, streetTypes, streetNameChanged, streetTypeChanged} = useStreets(props);
+  const {
+    updateStreets,
+    streets,
+    streetTypes,
+    streetNameChanged,
+    streetTypeChanged,
+  } = useStreets(props);
 
   const stepped = async (step) => {
-
-    if (!mapLoaded && step === 'Project Location') {
+    if (!mapLoaded && step === "Project Location") {
       await loadMap(mapRef.current, setLocation, setLocationSuccess);
       setMapLoaded(true);
     }
     setSelectedStep(step);
-    if (step === 'Instructions') {
+    if (step === "Instructions") {
       setAgree(false);
     }
-    if (step === 'Street Names') {
-      customElements.whenDefined('calcite-input-message').then(async _ => {
-        document.querySelectorAll('calcite-stepper-item[selected] calcite-input-message').forEach(message => {
-          var style = document.createElement( 'style' )
-          style.innerHTML = ':host([status="valid"]) .calcite-input-message-icon {color: var(--calcite-ui-warning) !important;}';
-          message.shadowRoot.appendChild( style )
-        })
-
+    if (step === "Street Names") {
+      customElements.whenDefined("calcite-input-message").then(async (_) => {
+        document
+          .querySelectorAll(
+            "calcite-stepper-item[selected] calcite-input-message"
+          )
+          .forEach((message) => {
+            var style = document.createElement("style");
+            style.innerHTML =
+              ':host([status="valid"]) .calcite-input-message-icon {color: var(--calcite-ui-warning) !important;}';
+            message.shadowRoot.appendChild(style);
+          });
       });
     }
   };
@@ -100,7 +120,6 @@ function Form(props) {
     });
     setFields(updateFields);
   };
-  
 
   const fileChanged = (e, i) => {
     var file = e.target.files[0];
@@ -111,11 +130,10 @@ function Form(props) {
       return f;
     });
     setFiles(newfiles);
-
   };
 
   useEffect(() => {
-    window.addEventListener('resize', _ => setAppWidth(window.innerWidth)) ;
+    window.addEventListener("resize", (_) => setAppWidth(window.innerWidth));
     (async () => {
       const fields = await getFields("155f0425df84404eb3a9b67cfcbece15");
       setContactFields(
@@ -142,17 +160,20 @@ function Form(props) {
     const updateFields = appFields.map((field, index) => {
       let result = { valid: true, reason: null };
       if (field.name.toLowerCase().includes("address")) {
-        field.value = location !== undefined ? location.getAttribute("address") : null;
+        field.value =
+          location !== undefined ? location.getAttribute("address") : null;
         field.valid = result.valid;
         field.reason = result.reason;
       }
       if (field.name.toLowerCase().includes("zip")) {
-        field.value = location !== undefined ? location.getAttribute("Postal") : null;
+        field.value =
+          location !== undefined ? location.getAttribute("Postal") : null;
         field.valid = result.valid;
         field.reason = result.reason;
       }
       if (field.name.toLowerCase() === "pinnum") {
-        field.value = location !== undefined ? location.getAttribute("pinnum") : null
+        field.value =
+          location !== undefined ? location.getAttribute("pinnum") : null;
         field.valid = result.valid;
         field.reason = result.reason;
       }
@@ -168,17 +189,21 @@ function Form(props) {
     <div className="formDiv">
       {contactFields.length === 0 && <CalciteScrim loading></CalciteScrim>}
       {contactFields.length > 0 && (
-        <CalciteStepper layout={appWidth <= 600 ? 'vertical' : 'horizontal'} scale="s" onCalciteStepperItemChange={(e) => {stepped(e.target.selectedItem.heading)}}>
-                    <CalciteStepperItem
+        <CalciteStepper
+          layout={appWidth <= 600 ? "vertical" : "horizontal"}
+          scale="s"
+          onCalciteStepperItemChange={(e) => {
+            stepped(e.target.selectedItem.heading);
+          }}
+        >
+          <CalciteStepperItem
             selected={selectedStep === "Instructions" ? true : undefined}
             ref={contactStep}
             heading="Instructions"
           >
-
             <Intro id="intro"></Intro>
             <CalciteButton
               scale="l"
-
               onClick={(e) => {
                 setSelectedStep("Contact Info");
                 stepped("Contact Info");
@@ -187,12 +212,11 @@ function Form(props) {
             >
               I Agree
             </CalciteButton>
-
           </CalciteStepperItem>
           <CalciteStepperItem
             selected={selectedStep === "Contact Info" ? true : undefined}
             ref={contactStep}
-            disabled={agree ? undefined : true}            
+            disabled={agree ? undefined : true}
             heading="Contact Info"
           >
             {contactFields.map((f, i) => (
@@ -248,11 +272,12 @@ function Form(props) {
                 : undefined
             }
           >
-            <CalciteNotice open kind={locationSuccess.valid ? 'success' : 'danger'}
-            icon={locationSuccess.valid ? 'check-circle-f' : 'x-octagon-f'}>
-            <div slot="message">
-              {locationSuccess.reason}    
-            </div>
+            <CalciteNotice
+              open
+              kind={locationSuccess.valid ? "success" : "danger"}
+              icon={locationSuccess.valid ? "check-circle-f" : "x-octagon-f"}
+            >
+              <div slot="message">{locationSuccess.reason}</div>
             </CalciteNotice>
             <div ref={mapRef}></div>
             <CalciteButton
@@ -273,7 +298,6 @@ function Form(props) {
           >
             {appFields.map((f, i) => (
               <CalciteLabel scale="l" key={f.name}>
-               
                 {f.alias}
                 <CalciteInput
                   scale="l"
@@ -304,10 +328,10 @@ function Form(props) {
                   }}
                   onCalciteInputChange={(e) => {
                     inputChanged(e, i, appFields, setAppFields);
-                  }}                  
+                  }}
                   status={f.valid ? "valid" : "invalid"}
                 ></CalciteInput>
-               
+
                 {!f.valid && (
                   <CalciteInputMessage
                     scale="l"
@@ -316,46 +340,49 @@ function Form(props) {
                     {f.reason}
                   </CalciteInputMessage>
                 )}
-                         { f.name === 'streetnamessubmitting' &&  streetsSubmitting === streetsNeeded && <CalciteNotice open kind="warning" icon="information">
-              <div slot="message">
-                Recommend submitting a few more street names than needed, in case there are
-                unapproveable street names.
-              </div>
-            </CalciteNotice>}     
+                {f.name === "streetnamessubmitting" &&
+                  streetsSubmitting === streetsNeeded && (
+                    <CalciteNotice open kind="warning" icon="information">
+                      <div slot="message">
+                        Recommend submitting a few more street names than
+                        needed, in case there are unapproveable street names.
+                      </div>
+                    </CalciteNotice>
+                  )}
               </CalciteLabel>
             ))}
 
             <CalciteLabel scale="l">
               Site Plan
-            <form ref={attachments}>
-              {files &&
-                files.map((file, i) => {
-                  return (
-                    <div className="row" key={`file${i.toString()}`}>
-                      <input
-                        id={`fileInput${i.toString()}`}
-                        accept="application/pdf,"
-                        type="file"
-                        name="attachment"
-                        capture="environment"
-                        onChange={(e) => {
-                          fileChanged(e, i);
-                        }}
-                      />
-                      <CalciteButton scale="l" className="upload">
-                        Upload File
-                      </CalciteButton>
-                      <CalciteLabel className="file-name" scale="l">
-                        {file?.name}{" "}
-                      </CalciteLabel>
-                      <label
-                        htmlFor={`fileInput${i.toString()}`}
-                        className="custom-file-upload"
-                      ></label>
-                    </div>
-                  );
-                })}
-            </form>
+              <form ref={attachments}>
+                {files &&
+                  files.map((file, i) => {
+                    return (
+                      <div className="row" key={`file${i.toString()}`}>
+                        <input
+                          id={`fileInput${i.toString()}`}
+                          accept="application/pdf,"
+                          type="file"
+                          name="attachment"
+                          capture="environment"
+                          onChange={(e) => {
+                            fileChanged(e, i);
+                          }}
+                        />
+                        <CalciteButton scale="l" className="upload">
+                          Upload File
+                        </CalciteButton>
+                        <CalciteLabel className="file-name" scale="l">
+                          {file?.name}{" "}
+                        </CalciteLabel>
+                        <label
+                          htmlFor={`fileInput${i.toString()}`}
+                          className="custom-file-upload"
+                        ></label>
+                      </div>
+                    );
+                  })}
+              </form>
             </CalciteLabel>
             <CalciteButton
               scale="l"
@@ -388,45 +415,57 @@ function Form(props) {
                   <span slot="title">Street {i + 1}</span>
                   <CalciteLabel scale="l">
                     Street Name
+                    <div className="street">
                     <CalciteInput
                       scale="l"
                       maxLength={20}
                       onCalciteInputChange={(e) => {
-                        e.target.setAttribute('clearable', true);
+                        e.target.setAttribute("clearable", true);
                         streetNameChanged(e, i);
                       }}
-                      onCalciteInputInput={e => e.target.setAttribute('clearable', true)}
+                      onCalciteInputInput={(e) =>
+                        e.target.setAttribute("clearable", true)
+                      }
                       value={street.name.value}
                       status={street.name.valid ? "valid" : "invalid"}
                     ></CalciteInput>
-                    
-                      <CalciteInputMessage
-                        scale="l"                    
-                        icon={!street.name.valid ? 'x-octagon-f' : street.name.valid && street.name.reason ? 'exclamation-mark-triangle-f' : undefined }
-                        status={street.name.valid ? "valid" : "invalid"}
-                      >
-                        {street.name.reason}
-                      </CalciteInputMessage>
-              
+                        <CalciteIcon icon="information" onClick={_ => setShowStreetNameRules(true)}></CalciteIcon>
+                    </div>
+                    <CalciteInputMessage
+                      scale="l"
+                      icon={
+                        !street.name.valid
+                          ? "x-octagon-f"
+                          : street.name.valid && street.name.reason
+                          ? "exclamation-mark-triangle-f"
+                          : undefined
+                      }
+                      status={street.name.valid ? "valid" : "invalid"}
+                    >
+                      {street.name.reason}
+                    </CalciteInputMessage>
                   </CalciteLabel>
                   {street.type && (
                     <CalciteLabel scale="l">
                       Street Type
-                      <CalciteSelect
-                        scale="l"
-                        onCalciteSelectChange={(e) => {
-                          streetTypeChanged(e, i);
-                        }}
-                      >
-                        {streetTypes.map((type) => (
-                          <CalciteOption key={type.code} value={type.code}>
-                            {type.name}
-                          </CalciteOption>
-                        ))}
-                      </CalciteSelect>
+                      <div className="street">
+                        <CalciteSelect
+                          scale="l"
+                          onCalciteSelectChange={(e) => {
+                            streetTypeChanged(e, i);
+                          }}
+                        >
+                          {streetTypes.map((type) => (
+                            <CalciteOption key={type.code} value={type.code}>
+                              {type.name}
+                            </CalciteOption>
+                          ))}
+                        </CalciteSelect>
+
+                        <CalciteIcon  icon="information" onClick={_ => setShowStreetTypes(true)}></CalciteIcon>
+                      </div>
                       {street.type.valid === false && (
                         <CalciteInputMessage
-
                           scale="l"
                           status={street.type.valid ? "valid" : "invalid"}
                         >
@@ -483,12 +522,46 @@ function Form(props) {
           You're applicaiton has been successfully submitted. Staff at the City
           of Raleigh and Wake County will review your application. Once
           approved, you will receive a copy of the application. Applications are
-          typically reviewed on Thursdays.
+          typically reviewed on Thursdays. If you do not receive an email within
+          30 minutes, please email us at{" "}
+          <CalciteLink iconStart="email-address" href="mailto:RaleighAddressing@raleighnc.gov" target="_blank">
+            RaleighAddressing@raleighnc.gov
+          </CalciteLink>
+          .
         </div>
-        <div slot="footer">
-          <CalciteButton onClick={(_) => setSuccess(false)}></CalciteButton>
-        </div>
+        <CalciteButton slot="primary" onClick={(_) => setSuccess(false)}>Dismiss</CalciteButton>
       </CalciteModal>
+      <CalciteModal
+        open={showStreetTypes ? true : undefined}
+        aria-labelledby="street-types-title"
+        id="street-types-modal"
+        onCalciteModalClose={() => setShowStreetTypes(false)}
+      >
+        <div slot="header" id="street-types-title">
+          Street Types
+        </div>
+        <div slot="content">
+        <StreetTypeList></StreetTypeList>
+        </div>
+          <CalciteButton slot="primary" onClick={() => setShowStreetTypes(false)}>Dismiss</CalciteButton>
+
+      </CalciteModal>      
+      <CalciteModal
+        open={showStreetNameRules ? true : undefined}
+        aria-labelledby="street-rules-title"
+        id="street-rules-modal"
+        onCalciteModalClose={() => setShowStreetNameRules(false)}
+      >
+        <div slot="header" id="street-rules-title">
+          Street Name Rules
+        </div>
+        <div slot="content">
+        <StreetNameRules></StreetNameRules>
+
+        </div>
+          <CalciteButton slot="primary" onClick={() => setShowStreetNameRules(false)}>Dismiss</CalciteButton>
+
+      </CalciteModal>          
     </div>
   );
 }

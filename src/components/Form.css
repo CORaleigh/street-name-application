@@ -59,3 +59,15 @@ input[type="file"] {
 .intro {
     font-size: 14px !important;
   }
+
+.street {
+  display: flex;
+}
+.street calcite-select, calcite-input {
+  width: 100%;
+  margin-right: 1em;
+}
+.street calcite-icon {
+  margin-top: 0.5em;
+  cursor: pointer;
+}

@@ -17,6 +17,9 @@ import '@esri/calcite-components/dist/components/calcite-button';
 import '@esri/calcite-components/dist/components/calcite-scrim';
 import '@esri/calcite-components/dist/components/calcite-notice';
 import '@esri/calcite-components/dist/components/calcite-modal';
+import '@esri/calcite-components/dist/components/calcite-link';
+import '@esri/calcite-components/dist/components/calcite-popover';
+import '@esri/calcite-components/dist/components/calcite-icon';
 
 import { setAssetPath } from "@esri/calcite-components/dist/components";
 setAssetPath(window.location.href);

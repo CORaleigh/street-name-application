@@ -33,10 +33,10 @@ const appLayer = new FeatureLayer({
 });
 
 const parcelsLayer = new FeatureLayer({
-    portalItem: {
-        id: '08050bf067bb4b20adea4b0b4f0a39e3'
-    },
-    layerId: 0
+  portalItem: {
+    id: "08050bf067bb4b20adea4b0b4f0a39e3",
+  },
+  layerId: 0,
 });
 
 const numbers = [
@@ -63,32 +63,46 @@ const directions = [
 ];
 
 (async () => {
-  const names = localStorage.getItem("street_name_application_streets");
-  if (names) {
-    streetNames = names.split(",");
-  } else {
-    await streetNameDirectory.load();
-    const count = await streetNameDirectory.queryFeatureCount({
-      where: "1=1",
+  let names = localStorage.getItem("street_name_application_streets");
+  let lastUpdated = localStorage.getItem(
+    "street_name_application_streets_last_updated");
+debugger
+  if (!names) {
+    const streetNameData = await import('./streetnames');
+    names = streetNameData.streetNameList.replace(/(\r\n|\n|\r)/gm, "");
+    localStorage.setItem("street_name_application_streets", names);
+    lastUpdated = streetNameData.streetNameListLastUpdated;
+    localStorage.setItem(
+      "street_name_application_streets_last_updated",
+      lastUpdated
+    );
+  }
+  streetNames = names.split(",");
+
+  await streetNameDirectory.load();
+  const count = await streetNameDirectory.queryFeatureCount({
+    where: `DATE_APPROVED >= date'${lastUpdated}'`,
+    returnDistinctValues: true,
+    outFields: ["ST_NAME"],
+  });
+  for (let i = 0; i < count / 1000; i++) {
+    console.log(i * 1000);
+    const result = await streetNameDirectory.queryFeatures({
+      start: i * 1000,
+      num: 1000,
+      where: `DATE_APPROVED >= date'${lastUpdated}'`,
       returnDistinctValues: true,
       outFields: ["ST_NAME"],
+      orderByFields: ["ST_NAME"],
     });
-    for (let i = 0; i < count / 1000; i++) {
-      console.log(i * 1000);
-      const result = await streetNameDirectory.queryFeatures({
-        start: i * 1000,
-        num: 1000,
-        where: "1=1",
-        returnDistinctValues: true,
-        outFields: ["ST_NAME"],
-        orderByFields: ["ST_NAME"],
-      });
-      streetNames += result.features.map((feature) =>
-        feature.getAttribute("ST_NAME")
-      );
-    }
-    localStorage.setItem("street_name_application_streets", streetNames);
+    streetNames = streetNames.concat(result.features.map((feature) =>
+      feature.getAttribute("ST_NAME")
+    ));
   }
+  streetNames = [...new Set(streetNames)];
+  streetNames = streetNames.sort();
+  localStorage.setItem("street_name_application_streets", streetNames);
+  localStorage.setItem("street_name_application_streets_last_updated", new Date().toLocaleDateString());
 })();
 
 export const getFields = async (id) => {
@@ -106,10 +120,10 @@ export const getFields = async (id) => {
     if (f.name === "contact") {
       f.placeholder = "First Last";
     }
-    if (f.name === 'streetnamessubmitting' || f.name === 'streetnamesneeded') {
-      f.value = '1';
+    if (f.name === "streetnamessubmitting" || f.name === "streetnamesneeded") {
+      f.value = "1";
     }
-  });  
+  });
   return appLayer.fields;
 };
 
@@ -119,28 +133,28 @@ export const loadMap = async (container, setLocation, setLocationSuccess) => {
       portalItem: {
         id: "109c9fa256a44e28a29a528ca18637e0",
       },
-    }
+    },
   });
   const view = new MapView({
     map: map,
     container: container,
     zoom: 10,
-    center: [-78.6382, 35.7796]
+    center: [-78.6382, 35.7796],
   });
-  parcelsLayer.outFields = ['PIN_NUM', 'SITE_ADDRESS'];
+  parcelsLayer.outFields = ["PIN_NUM", "SITE_ADDRESS"];
   view.map.add(parcelsLayer);
   const search = new Search({
     view: view,
     includeDefaultSources: false,
     sources: [
-          {
-            url: 'https://maps.raleighnc.gov/arcgis/rest/services/Locators/Locator/GeocodeServer',
-            singleLineFieldName: 'SingleLine',
-            outFields: ['*'],
-            placeholder: 'Search by address',
-            zoomScale: 4800
-          }
-    ]
+      {
+        url: "https://maps.raleighnc.gov/arcgis/rest/services/Locators/Locator/GeocodeServer",
+        singleLineFieldName: "SingleLine",
+        outFields: ["*"],
+        placeholder: "Search by address",
+        zoomScale: 4800,
+      },
+    ],
   });
   await streetNameDirectory.load();
   view.ui.add(search, "top-right");
@@ -153,65 +167,99 @@ export const loadMap = async (container, setLocation, setLocationSuccess) => {
 
     feature = e.results[0].results[0]?.feature;
 
- 
-    let success = {valid: false, reason: `Location not set, search by address in the upper right corner of the map`};
+    let success = {
+      valid: false,
+      reason: `Location not set, search by address in the upper right corner of the map`,
+    };
 
     try {
-        await reactiveUtils.whenOnce(_ => view.updating === true);
-        await reactiveUtils.whenOnce(_ => view.updating === false);
-        success =  await checkJurisdiction(feature.geometry);
-        if (success.valid) {
-          feature.setAttribute('Postal', feature.attributes['Postal']);
-          feature.setAttribute('address', feature.attributes['ShortLabel']);
-          const hitTest = await view.hitTest(view.toScreen(feature.geometry), {include: [parcelsLayer]});
-          debugger
-          if (hitTest.results.length) {
-            feature.setAttribute('pinnum', hitTest.results[0].graphic.attributes['PIN_NUM']);
-            success = {valid: true, reason: `Location set to ${feature.attributes['address']}`};
-  
-            setLocation(feature);          
-          } else {
-            success = {valid: false, reason: 'Address not located on a property'};
-          }
+      await reactiveUtils.whenOnce((_) => view.updating === true);
+      await reactiveUtils.whenOnce((_) => view.updating === false);
+      success = await checkJurisdiction(feature.geometry);
+      if (success.valid) {
+        feature.setAttribute("Postal", feature.attributes["Postal"]);
+        feature.setAttribute("address", feature.attributes["ShortLabel"]);
+        const hitTest = await view.hitTest(view.toScreen(feature.geometry), {
+          include: [parcelsLayer],
+        });
+        debugger;
+        if (hitTest.results.length) {
+          feature.setAttribute(
+            "pinnum",
+            hitTest.results[0].graphic.attributes["PIN_NUM"]
+          );
+          success = {
+            valid: true,
+            reason: `Location set to ${feature.attributes["address"]}`,
+          };
 
-
+          setLocation(feature);
         } else {
-          setLocation(undefined);
+          success = {
+            valid: false,
+            reason: "Address not located on a property",
+          };
         }
-
-    } catch (reason) {
+      } else {
         setLocation(undefined);
-        console.log(success)
+      }
+    } catch (reason) {
+      setLocation(undefined);
+      console.log(success);
     } finally {
-      setLocationSuccess(success)
-
+      setLocationSuccess(success);
     }
   });
 };
 export const checkJurisdiction = async (geometry) => {
-  const layer = new FeatureLayer({url: 'https://maps.wakegov.com/arcgis/rest/services/Jurisdictions/Jurisdictions/MapServer/1'});
+  const layer = new FeatureLayer({
+    url: "https://maps.wakegov.com/arcgis/rest/services/Jurisdictions/Jurisdictions/MapServer/1",
+  });
   await layer.load();
-  const result = await layer.queryFeatures({geometry: geometry, outFields:['JURISDICTION'], returnGeometry: false});
+  const result = await layer.queryFeatures({
+    geometry: geometry,
+    outFields: ["JURISDICTION"],
+    returnGeometry: false,
+  });
   if (!result.features.length) {
-    return {valid: false, reason: 'Property not located inside the City of Raleigh, please submit through Wake County'};
+    return {
+      valid: false,
+      reason:
+        "Property not located inside the City of Raleigh, please submit through Wake County",
+    };
   }
-  if (result.features[0].getAttribute('JURISDICTION') !== 'RALEIGH') {
-    return {valid: false, reason: `Property is located in ${result.features[0].getAttribute('JURISDICTION')} please check their website`}; 
+  if (result.features[0].getAttribute("JURISDICTION") !== "RALEIGH") {
+    return {
+      valid: false,
+      reason: `Property is located in ${result.features[0].getAttribute(
+        "JURISDICTION"
+      )} please check their website`,
+    };
   }
-  return {valid: true, reason: `Property located in City of Raleigh's jurisdiction`};
-}
+  return {
+    valid: true,
+    reason: `Property located in City of Raleigh's jurisdiction`,
+  };
+};
 export const getZip = async (feature) => {
-    const zipLayer = new FeatureLayer({portalItem: {
-        id: '41fcd86f6b0c459ebdc576763a9145cf',
-    }, layerId: 0});
-    await zipLayer.load();
-    let zip = null;
-    const result = await zipLayer.queryFeatures({geometry: feature.geometry.centroid, outFields:['ZIPNUM'], returnGeometry: false});
-    if (result.features) {
-         zip = parseInt(result.features[0].getAttribute('ZIPNUM')).toString();
-    }
-    return zip;
-}
+  const zipLayer = new FeatureLayer({
+    portalItem: {
+      id: "41fcd86f6b0c459ebdc576763a9145cf",
+    },
+    layerId: 0,
+  });
+  await zipLayer.load();
+  let zip = null;
+  const result = await zipLayer.queryFeatures({
+    geometry: feature.geometry.centroid,
+    outFields: ["ZIPNUM"],
+    returnGeometry: false,
+  });
+  if (result.features) {
+    zip = parseInt(result.features[0].getAttribute("ZIPNUM")).toString();
+  }
+  return zip;
+};
 export const getStreetTypes = async () => {
   await streetTable.load();
   const streetTypeField = streetTable.fields.find(
@@ -241,7 +289,7 @@ export const checkStreetNames = async (value, streetTypes) => {
   }
   let containsType = false;
   types.forEach((type) => {
-    if (streetName.includes(' ' + type) || streetName.includes(type + ' ')) {
+    if (streetName.includes(" " + type) || streetName.includes(type + " ")) {
       containsType = true;
     }
   });
@@ -250,7 +298,10 @@ export const checkStreetNames = async (value, streetTypes) => {
   }
   let containsDirection = false;
   directions.forEach((direction) => {
-    if (streetName.includes(' '+direction) || streetName.includes(direction + ' ')) {
+    if (
+      streetName.includes(" " + direction) ||
+      streetName.includes(direction + " ")
+    ) {
       containsDirection = true;
     }
   });
@@ -280,42 +331,54 @@ export const checkStreetNames = async (value, streetTypes) => {
   // if (result.features.length) {
   //   return { valid: false, reason: "Street name is already in use" };
   // }
-  if (streetNames.find(name => {
-    return name.replace(' ', '') === streetName.replace(' ','');
-  })) {
+  if (
+    streetNames.find((name) => {
+      return name.replace(" ", "") === streetName.replace(" ", "");
+    })
+  ) {
     return { valid: false, reason: "Street name is already in use" };
-
   }
   let soundsLike = { valid: true, reason: "" };
   console.clear();
 
   for (let i = 0; i < streetNames.length; i++) {
-      const name = streetNames[i];
-      if (compareTwoStrings(name, streetName) >= 0.7) {
-        if (compareTwoStrings(name, streetName) >= 0.75) {
-          //soundsLike = name;
-        }
-        console.log(name, compareTwoStrings(name, streetName));
-      }      
-
-      // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 1) {
-      //   soundsLike = { valid: false, reason: "Sounds too similar to " + name };
-      //   break;
-      // }
-      // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 2) {
-      //   if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) > 0.75) {
-      //     soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
-      //   }
-      // }
-      if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) >= 0.8) {
-        soundsLike = { valid: false, reason: "Sounds too similar to " + name };
-        break;
+    const name = streetNames[i];
+    if (compareTwoStrings(name, streetName) >= 0.7) {
+      if (compareTwoStrings(name, streetName) >= 0.75) {
+        //soundsLike = name;
       }
-      if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) >= 0.70) {
-        soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
-      }      
+      console.log(name, compareTwoStrings(name, streetName));
+    }
 
-  };
+    // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 1) {
+    //   soundsLike = { valid: false, reason: "Sounds too similar to " + name };
+    //   break;
+    // }
+    // if (levenshteinEditDistance(name.replace(' ', ''), streetName.replace(' ', '')) === 2) {
+    //   if (compareTwoStrings(name.replace(' ', ''), streetName.replace(' ', '')) > 0.75) {
+    //     soundsLike = { valid: true, reason: "May sound similar to " + name +".  If you don't think it sounds similar, you can still submit it." }
+    //   }
+    // }
+    if (
+      compareTwoStrings(name.replace(" ", ""), streetName.replace(" ", "")) >=
+      0.8
+    ) {
+      soundsLike = { valid: false, reason: "Sounds too similar to " + name };
+      break;
+    }
+    if (
+      compareTwoStrings(name.replace(" ", ""), streetName.replace(" ", "")) >=
+      0.7
+    ) {
+      soundsLike = {
+        valid: true,
+        reason:
+          "May sound similar to " +
+          name +
+          ".  If you don't think it sounds similar, you can still submit it.",
+      };
+    }
+  }
 
   return soundsLike;
 };
@@ -352,7 +415,7 @@ export const submitApplication = async (
   location,
   attachments
 ) => {
-    debugger
+  debugger;
   const application = new Graphic({
     attributes: {},
     geometry: location.centroid,
@@ -383,12 +446,20 @@ export const submitApplication = async (
       const streetResult = await streetTable.applyEdits({
         addFeatures: streetnames,
       });
-      await appLayer.addAttachment({attributes: {OBJECTID: result.addFeatureResults[0].objectId, GlobalId: result.addFeatureResults[0].globalId}}, attachments.current);
+      await appLayer.addAttachment(
+        {
+          attributes: {
+            OBJECTID: result.addFeatureResults[0].objectId,
+            GlobalId: result.addFeatureResults[0].globalId,
+          },
+        },
+        attachments.current
+      );
 
       return true;
     }
   } catch (error) {
-    debugger
+    debugger;
     return false;
   }
 };
