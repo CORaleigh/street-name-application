@@ -66,7 +66,7 @@ const directions = [
   let names = localStorage.getItem("street_name_application_streets");
   let lastUpdated = localStorage.getItem(
     "street_name_application_streets_last_updated");
-debugger
+
   if (!names) {
     const streetNameData = await import('./streetnames');
     names = streetNameData.streetNameList.replace(/(\r\n|\n|\r)/gm, "");
@@ -127,7 +127,7 @@ export const getFields = async (id) => {
   return appLayer.fields;
 };
 
-export const loadMap = async (container, setLocation, setLocationSuccess) => {
+export const loadMap = async (container, setLocation, setLocationSuccess, setScreenshot) => {
   const map = new Map({
     basemap: {
       portalItem: {
@@ -194,6 +194,7 @@ export const loadMap = async (container, setLocation, setLocationSuccess) => {
           };
 
           setLocation(feature);
+          setScreenshot(await view.takeScreenshot());
         } else {
           success = {
             valid: false,
@@ -202,9 +203,12 @@ export const loadMap = async (container, setLocation, setLocationSuccess) => {
         }
       } else {
         setLocation(undefined);
+        setScreenshot(undefined);
       }
     } catch (reason) {
       setLocation(undefined);
+      setScreenshot(undefined);
+
       console.log(success);
     } finally {
       setLocationSuccess(success);
@@ -413,9 +417,10 @@ export const submitApplication = async (
   appFields,
   streets,
   location,
-  attachments
+  attachments,
+  screenshot,
+  screenshotRef
 ) => {
-  debugger;
   const application = new Graphic({
     attributes: {},
     geometry: location.centroid,
@@ -446,6 +451,9 @@ export const submitApplication = async (
       const streetResult = await streetTable.applyEdits({
         addFeatures: streetnames,
       });
+
+
+
       await appLayer.addAttachment(
         {
           attributes: {
@@ -455,7 +463,26 @@ export const submitApplication = async (
         },
         attachments.current
       );
-
+      if (screenshot) {
+        const res = await fetch(screenshot.dataUrl);
+        debugger
+        const blob = await res.blob();
+        const file = new File([blob], 'screenshot.png');
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        screenshotRef.current.querySelector('input[name="screenshot"]').files = dt.files;
+        //const formData = new FormData(attachments.current);
+        //formData.append('screenshot', dataURItoBlob(screenshot.dataUrl));
+        await appLayer.addAttachment(
+          {
+            attributes: {
+              OBJECTID: result.addFeatureResults[0].objectId,
+              GlobalId: result.addFeatureResults[0].globalId,
+            },
+          },
+          screenshotRef.current
+        );
+      }
       return true;
     }
   } catch (error) {

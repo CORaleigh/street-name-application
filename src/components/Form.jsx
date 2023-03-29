@@ -56,7 +56,9 @@ function Form(props) {
   const [files, setFiles] = useState([{}]);
   const [agree, setAgree] = useState(false);
   const [appWidth, setAppWidth] = useState(window.innerWidth);
+  const [screenshot, setScreenshot] = useState();
   const attachments = useRef(null);
+  const screenshotRef = useRef(null);
 
   const {
     updateStreets,
@@ -68,7 +70,7 @@ function Form(props) {
 
   const stepped = async (step) => {
     if (!mapLoaded && step === "Project Location") {
-      await loadMap(mapRef.current, setLocation, setLocationSuccess);
+      await loadMap(mapRef.current, setLocation, setLocationSuccess, setScreenshot);
       setMapLoaded(true);
     }
     setSelectedStep(step);
@@ -382,6 +384,14 @@ function Form(props) {
                       </div>
                     );
                   })}
+
+              </form>
+              <form ref={screenshotRef}>
+              {screenshot && <input
+                          id='screenshot'
+                          type="file"
+                          name="screenshot"
+                        />}
               </form>
             </CalciteLabel>
             <CalciteButton
@@ -495,7 +505,9 @@ function Form(props) {
                       appFields,
                       streets,
                       location,
-                      attachments
+                      attachments,
+                      screenshot,
+                      screenshotRef
                     )
                   );
                 }}
