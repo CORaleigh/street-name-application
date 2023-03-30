@@ -54,6 +54,7 @@ function Form(props) {
 
   const [location, setLocation] = useState(undefined);
   const [files, setFiles] = useState([{}]);
+  const [fileLimit, setFileLimit] = useState(false);
   const [agree, setAgree] = useState(false);
   const [appWidth, setAppWidth] = useState(window.innerWidth);
   const [screenshot, setScreenshot] = useState();
@@ -125,15 +126,28 @@ function Form(props) {
 
   const fileChanged = (e, i) => {
     var file = e.target.files[0];
-    const newfiles = files.map((f, index) => {
-      if (index === i) {
-        f.name = file.name;
-      }
-      return f;
-    });
-    setFiles(newfiles);
-  };
+    console.log(file.size);
+    if (file.size * 0.000001 <= 10) {
+      const newfiles = files.map((f, index) => {
+        if (index === i) {
+          f.name = file.name;
+        }
+        return f;
+      });
+      setFiles(newfiles);
+      setFileLimit(false);
 
+    } else {
+      removeFile();
+      setFileLimit(true);
+    }
+
+  };
+  const removeFile = () => {
+    setFiles([...[], ...[{}]]);
+    const dt = new DataTransfer();
+    attachments.current.querySelector('input').files = dt.files;
+  }
   useEffect(() => {
     window.addEventListener("resize", (_) => setAppWidth(window.innerWidth));
     (async () => {
@@ -353,7 +367,7 @@ function Form(props) {
                   )}
               </CalciteLabel>
             ))}
-
+            <br/>
             <CalciteLabel scale="l">
               Site Plan
               <form ref={attachments}>
@@ -371,12 +385,15 @@ function Form(props) {
                             fileChanged(e, i);
                           }}
                         />
-                        <CalciteButton scale="l" className="upload">
+                        <CalciteButton disabled={file?.name ? true : undefined} scale="l" className="upload">
                           Upload File
                         </CalciteButton>
-                        <CalciteLabel className="file-name" scale="l">
+                        {file?.name && <span className="file-name" scale="l">
                           {file?.name}{" "}
-                        </CalciteLabel>
+
+                        </span>}                        
+                        {file?.name && <CalciteIcon className="file-delete" icon="trash" onClick={removeFile}></CalciteIcon>}
+
                         <label
                           htmlFor={`fileInput${i.toString()}`}
                           className="custom-file-upload"
@@ -384,13 +401,21 @@ function Form(props) {
                       </div>
                     );
                   })}
-
+              <CalciteNotice
+              open
+              kind={fileLimit ? 'danger' : 'info'}
+              icon={fileLimit ? 'x-octagon-f' : 'information'}
+              >
+              <div slot="message">{fileLimit ? 'File is larger than 10MB' : 'Must be a single PDF file under 10MB'}</div>
+            </CalciteNotice>
               </form>
               <form ref={screenshotRef}>
               {screenshot && <input
                           id='screenshot'
                           type="file"
                           name="screenshot"
+                          accept="image/png"
+
                         />}
               </form>
             </CalciteLabel>

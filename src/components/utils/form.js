@@ -153,8 +153,15 @@ export const loadMap = async (container, setLocation, setLocationSuccess, setScr
         outFields: ["*"],
         placeholder: "Search by address",
         zoomScale: 4800,
+        resultSymbol: {
+          type: 'picture-marker',
+          url: './assets/pin.svg',
+          height: 36,
+          width: 36,
+        }
       },
     ],
+    
   });
   await streetNameDirectory.load();
   view.ui.add(search, "top-right");
@@ -194,7 +201,7 @@ export const loadMap = async (container, setLocation, setLocationSuccess, setScr
           };
 
           setLocation(feature);
-          setScreenshot(await view.takeScreenshot());
+          setScreenshot(await view.takeScreenshot({width: 1048, height: 586}));
         } else {
           success = {
             valid: false,
@@ -453,40 +460,49 @@ export const submitApplication = async (
       });
 
 
-
-      await appLayer.addAttachment(
-        {
-          attributes: {
-            OBJECTID: result.addFeatureResults[0].objectId,
-            GlobalId: result.addFeatureResults[0].globalId,
-          },
-        },
-        attachments.current
-      );
-      if (screenshot) {
-        const res = await fetch(screenshot.dataUrl);
-        debugger
-        const blob = await res.blob();
-        const file = new File([blob], 'screenshot.png');
-        const dt = new DataTransfer();
-        dt.items.add(file);
-        screenshotRef.current.querySelector('input[name="screenshot"]').files = dt.files;
-        //const formData = new FormData(attachments.current);
-        //formData.append('screenshot', dataURItoBlob(screenshot.dataUrl));
-        await appLayer.addAttachment(
-          {
-            attributes: {
-              OBJECTID: result.addFeatureResults[0].objectId,
-              GlobalId: result.addFeatureResults[0].globalId,
+      if (attachments.current.querySelector('input').files.length) {
+        try {
+          await appLayer.addAttachment(
+            {
+              attributes: {
+                OBJECTID: result.addFeatureResults[0].objectId,
+                GlobalId: result.addFeatureResults[0].globalId,
+              },
             },
-          },
-          screenshotRef.current
-        );
+            attachments.current
+          );
+        } catch (error) {
+          console.log(error);
+        }
       }
-      return true;
+
+
+      if (screenshot) {
+        try {
+          const res = await fetch(screenshot.dataUrl,{responseType:'blob'});
+          let blob = await res.blob()
+          const file = new File([blob], 'screenshot.png', {type: 'image/png'});
+          const dt = new DataTransfer();
+          dt.items.add(file);
+          screenshotRef.current.querySelector('input[name="screenshot"]').files = dt.files;
+          await appLayer.addAttachment(
+            {
+              attributes: {
+                OBJECTID: result.addFeatureResults[0].objectId,
+                GlobalId: result.addFeatureResults[0].globalId,
+              },
+            },
+            screenshotRef.current
+          );
+        } catch (error) {
+          console.log(error);
+        }
+        
+      }
+
     }
   } catch (error) {
-    debugger;
-    return false;
+    console.log(error);
   }
+  return true;
 };

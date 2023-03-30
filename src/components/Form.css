@@ -42,14 +42,20 @@ input[type="file"] {
     flex-direction: row;
   }
 
-  .file-name {
-    margin-top: 2em;
-    margin-left: 2em;
+  .file-delete {
+    margin-top: 5px;
   }
+
+
+  .file-name {
+    margin-top: 10px;
+    margin-left: 2em;
+    margin-right: 1em;
+  }  
 
   calcite-notice {
     margin-left: 0;
-    margin-bottom: 2em;
+
   }
 
   calcite-stepper-item {
