@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { getStreetTypes, checkStreetNames } from "./form";
-const useStreets = props => {
+import { getStreetTypes, checkStreetNames } from "./streets";
+const useStreets = (props) => {
   const [streets, setStreets] = useState([
     {
       name: { value: null, valid: false, reason: "Street name required" },
       type: { value: null, valid: false, reason: "Street type required" },
     },
   ]);
-    const [streetTypes, setStreetTypes] = useState([
+  const [streetTypes, setStreetTypes] = useState([
     {
       name: "Select street type...",
       code: null,
@@ -16,32 +16,32 @@ const useStreets = props => {
   const [streetsSubmitting, setStreetsSubmitting] = useState(1);
   const updateStreets = (e) => {
     if (parseInt(e.target.value) < streetsSubmitting) {
-      setStreets(streets.slice(0, -1));
+      return streets.slice(0, -1);
+      //setStreets(streets.slice(0, -1));
     } else {
-        const newStreets = streets.filter((street, i) => {
-            return i < parseInt(e.target.value);
+      const newStreets = streets.filter((street, i) => {
+        return i < parseInt(e.target.value);
+      });
+      for (let i = newStreets.length; i < parseInt(e.target.value); i++) {
+        newStreets.push({
+          name: { value: null, valid: false, reason: "Street name required" },
+          type: { value: null, valid: false, reason: "Street type required" },
         });
-        for (let i = newStreets.length; i < parseInt(e.target.value);i++) {
-            newStreets.push({
-                name: { value: null, valid: false, reason: "Street name required" },
-                type: { value: null, valid: false, reason: "Street type required" },
-            });
-        }
-    //   const addStreets = [];
-    //   for (let i = streets.length; i < parseInt(e.target.value); i++) {
-    //     addStreets.push({
-    //       name: { value: null, valid: false, reason: "Street name required" },
-    //       type: { value: null, valid: false, reason: "Street type required" },
-    //     });
-    //   }
-      //setStreets([...streets, ...addStreets]);
-      setStreets(newStreets);
+      }
+      //   const addStreets = [];
+      //   for (let i = streets.length; i < parseInt(e.target.value); i++) {
+      //     addStreets.push({
+      //       name: { value: null, valid: false, reason: "Street name required" },
+      //       type: { value: null, valid: false, reason: "Street type required" },
+      //     });
+      //   }
+      return newStreets;
+      // setStreets(newStreets);
     }
 
-   // setStreetsSubmitting(parseInt(e.target.value));
+    // setStreetsSubmitting(parseInt(e.target.value));
   };
-const streetNameChanged = async (e, i) => {
-  
+  const streetNameChanged = async (e, i) => {
     const result = await checkStreetNames(e.target.value, streetTypes);
     const newStreets = streets.map((street, index) => {
       if (index === i) {
@@ -53,6 +53,7 @@ const streetNameChanged = async (e, i) => {
       }
       return street;
     });
+    return newStreets;
     setStreets(newStreets);
   };
   const streetTypeChanged = async (e, i) => {
@@ -73,8 +74,16 @@ const streetNameChanged = async (e, i) => {
     setStreets(newStreets);
   };
   useEffect(() => {
-    (async _ => setStreetTypes([...streetTypes, ...(await getStreetTypes())]))()
+    (async (_) =>
+      setStreetTypes([...streetTypes, ...(await getStreetTypes())]))();
   }, []);
-  return {updateStreets, streets, streetTypes, streetNameChanged, streetTypeChanged}
-}
+  return {
+    updateStreets,
+    streets,
+    setStreets,
+    streetTypes,
+    streetNameChanged,
+    streetTypeChanged,
+  };
+};
 export default useStreets;

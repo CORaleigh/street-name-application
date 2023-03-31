@@ -1,75 +1,73 @@
-form, .formDiv {
-    height: 100%;
-    margin: 1em;
+form,
+.formDiv {
+  height: 100%;
+  margin: 1em;
 }
 
- .esri-view {
-    height: 60vh;
-    width: 100%;
-    margin-bottom: 1em !important;
-    background-color: #e1e1e1;
+.esri-view {
+  height: 60vh;
+  width: 100%;
+  margin-bottom: 1em !important;
+  background-color: #e1e1e1;
 }
 calcite-card {
-    margin-bottom: 1em;
+  margin-bottom: 1em;
 }
 
-calcite-input-message[status='invalid'] {
-    color: var(--calcite-ui-danger);
+calcite-input-message[status="invalid"] {
+  color: var(--calcite-ui-danger);
 }
-calcite-input-message[status='valid'] {
+calcite-input-message[status="valid"] {
   color: var(--calcite-ui-warning);
 }
 .custom-file-upload {
-    height: 44px;
-    width: 116px;
-    z-index: 0;
-    position: absolute;
-    left: 0;
-
+  height: 44px;
+  width: 116px;
+  z-index: 0;
+  position: absolute;
+  left: 0;
 }
 
 input[type="file"] {
-    display: none;
-  }
+  display: none;
+}
 
-  .upload {
-    margin-bottom: 1em;
+.upload {
+  margin-bottom: 1em;
+}
 
-  }
+.row {
+  display: flex;
+  flex-direction: row;
+}
 
-  .row {
-    display: flex;
-    flex-direction: row;
-  }
+.file-delete {
+  margin-top: 5px;
+}
 
-  .file-delete {
-    margin-top: 5px;
-  }
+.file-name {
+  margin-top: 10px;
+  margin-left: 2em;
+  margin-right: 1em;
+}
 
+calcite-notice {
+  margin-left: 0;
+}
 
-  .file-name {
-    margin-top: 10px;
-    margin-left: 2em;
-    margin-right: 1em;
-  }  
-
-  calcite-notice {
-    margin-left: 0;
-
-  }
-
-  calcite-stepper-item {
-    width: 100%;
-  }
+calcite-stepper-item {
+  width: 100%;
+}
 
 .intro {
-    font-size: 14px !important;
-  }
+  font-size: 14px !important;
+}
 
 .street {
   display: flex;
 }
-.street calcite-select, calcite-input {
+.street calcite-select,
+calcite-input {
   width: 100%;
   margin-right: 1em;
 }
