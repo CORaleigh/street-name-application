@@ -1,15 +1,8 @@
 import {
-  CalciteLabel,
-  CalciteInput,
   CalciteStepper,
   CalciteStepperItem,
-  CalciteCard,
-  CalciteSelect,
-  CalciteOption,
-  CalciteInputMessage,
   CalciteButton,
-  CalciteScrim,
-  CalciteIcon,
+  CalciteScrim
 } from "@esri/calcite-components-react";
 
 import { useEffect, useRef, useState } from "react";
@@ -25,6 +18,7 @@ import ProjectDetails from "./ProjectDetails";
 import SubmittedModal from "./SubmittedModal";
 import StreetTypesModal from "./StreetTypesModal";
 import StreetNameRulesModal from "./StreetNameRulesModal";
+import Streets from "./Streets";
 
 function Form(props) {
   const [appFields, setAppFields] = useState([]);
@@ -45,12 +39,8 @@ function Form(props) {
   const [streetsSubmitting, setStreetsSubmitting] = useState(1);
 
   const {
-    updateStreets,
     streets,
     setStreets,
-    streetTypes,
-    streetNameChanged,
-    streetTypeChanged,
   } = useStreets(props);
 
   const stepped = async (step) => {
@@ -213,81 +203,9 @@ function Form(props) {
                 : undefined
             }
           >
-            {JSON.stringify(streets)}
-            {streets.map((street, i) => {
-              return (
-                <CalciteCard key={i + 1}>
-                  <span slot="title">Street {i + 1}</span>
-                  <CalciteLabel scale="l">
-                    Street Name
-                    <div className="street">
-                      <CalciteInput
-                        scale="l"
-                        maxLength={20}
-                        onCalciteInputChange={async (e) => {
-                          e.target.setAttribute("clearable", true);
-                          setStreets(await streetNameChanged(e, i));
-                        }}
-                        onCalciteInputInput={(e) =>
-                          e.target.setAttribute("clearable", true)
-                        }
-                        value={street.name.value}
-                        status={street.name.valid ? "valid" : "invalid"}
-                      ></CalciteInput>
-                      <CalciteIcon
-                        icon="information"
-                        onClick={(_) => setShowStreetNameRules(true)}
-                      ></CalciteIcon>
-                    </div>
-                    <CalciteInputMessage
-                      scale="l"
-                      icon={
-                        !street.name.valid
-                          ? "x-octagon-f"
-                          : street.name.valid && street.name.reason
-                          ? "exclamation-mark-triangle-f"
-                          : undefined
-                      }
-                      status={street.name.valid ? "valid" : "invalid"}
-                    >
-                      {street.name.reason}
-                    </CalciteInputMessage>
-                  </CalciteLabel>
-                  {street.type && (
-                    <CalciteLabel scale="l">
-                      Street Type
-                      <div className="street">
-                        <CalciteSelect
-                          scale="l"
-                          onCalciteSelectChange={(e) => {
-                            streetTypeChanged(e, i);
-                          }}
-                        >
-                          {streetTypes.map((type) => (
-                            <CalciteOption key={type.code} value={type.code}>
-                              {type.name}
-                            </CalciteOption>
-                          ))}
-                        </CalciteSelect>
-
-                        <CalciteIcon
-                          icon="information"
-                          onClick={() => setShowStreetTypes(true)}
-                        ></CalciteIcon>
-                      </div>
-                      {street.type.valid === false && (
-                        <CalciteInputMessage
-                          scale="l"
-                          status={street.type.valid ? "valid" : "invalid"}
-                        >
-                          {street.type.reason}
-                        </CalciteInputMessage>
-                      )}
-                    </CalciteLabel>
-                  )}
-                </CalciteCard>
-              );
-            })}
+            <Streets
+              streets={streets} 
+              streetsUpdated={streets => setStreets(streets)}></Streets>
             {streets.length && (
               <CalciteButton
                 scale="l"

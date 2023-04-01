@@ -85,7 +85,7 @@ export const submitApplication = async (
             },
           })
       );
-      const streetResult = await streetTable.applyEdits({
+      await streetTable.applyEdits({
         addFeatures: streetnames,
       });
 

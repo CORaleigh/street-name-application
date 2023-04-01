@@ -54,7 +54,7 @@ const useStreets = (props) => {
       return street;
     });
     return newStreets;
-    setStreets(newStreets);
+    //setStreets(newStreets);
   };
   const streetTypeChanged = async (e, i) => {
     let result = { valid: true, reason: null };
@@ -71,7 +71,8 @@ const useStreets = (props) => {
       }
       return street;
     });
-    setStreets(newStreets);
+    return newStreets;
+    //setStreets(newStreets);
   };
   useEffect(() => {
     (async (_) =>
