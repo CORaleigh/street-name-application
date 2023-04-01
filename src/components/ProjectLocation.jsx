@@ -1,8 +1,5 @@
 import {
   CalciteButton,
-  CalciteInput,
-  CalciteInputMessage,
-  CalciteLabel,
   CalciteNotice,
 } from "@esri/calcite-components-react";
 import { useEffect, useState, useRef } from "react";
@@ -17,7 +14,7 @@ function ProjectLocation(props) {
   });
   const [mapLoaded, setMapLoaded] = useState(false);
   const [location, setLocation] = useState(undefined);
-
+  const [screenshot, setScreenshot] = useState();
   useEffect(() => {
     (async () => {
       if (!mapLoaded) {
@@ -26,7 +23,8 @@ function ProjectLocation(props) {
           setLocation,
           setLocationFound,
           props.locationSet,
-          props.screenshotSet
+          props.screenshotSet,
+          setScreenshot
         );
         setMapLoaded(true);
       }
@@ -44,7 +42,7 @@ function ProjectLocation(props) {
       <div ref={mapRef}></div>
       <CalciteButton
         scale="l"
-        disabled={location !== undefined ? undefined : true}
+        disabled={location !== undefined && screenshot !== undefined ? undefined : true}
         onClick={(e) => {
           props.nextStep("Project Details");
         }}

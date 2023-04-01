@@ -17,7 +17,8 @@ export const loadMap = async (
   setLocation,
   setLocationFound,
   locationSet,
-  screenshotSet
+  screenshotSet,
+  setScreenshot
 ) => {
   const map = new Map({
     basemap: {
@@ -84,15 +85,16 @@ export const loadMap = async (
             "pinnum",
             hitTest.results[0].graphic.attributes["PIN_NUM"]
           );
+
+          setLocation(feature);
+          locationSet(feature);
+          const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
+          screenshotSet(screenshot);
+          setScreenshot(screenshot);
           success = {
             valid: true,
             reason: `Location set to ${feature.attributes["address"]}`,
           };
-          setLocation(feature);
-          locationSet(feature);
-          screenshotSet(
-            await view.takeScreenshot({ width: 1048, height: 586 })
-          );
         } else {
           success = {
             valid: false,
