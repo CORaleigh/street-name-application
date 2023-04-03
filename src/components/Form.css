@@ -75,3 +75,7 @@ calcite-input {
   margin-top: 0.5em;
   cursor: pointer;
 }
+
+.approval-list {
+  height: 500px;
+}

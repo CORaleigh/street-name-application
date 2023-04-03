@@ -32,6 +32,7 @@ function ContactInfo(props) {
               inputChanged(e, i, contactFields, setContactFields);
             }}
             value={f.value}
+            disabled={props.addStreets ? true : undefined}
           ></CalciteInput>
           {!f.valid && (
             <CalciteInputMessage

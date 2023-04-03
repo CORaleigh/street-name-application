@@ -22,7 +22,8 @@ import "@esri/calcite-components/dist/components/calcite-popover";
 import "@esri/calcite-components/dist/components/calcite-icon";
 
 import { setAssetPath } from "@esri/calcite-components/dist/components";
-setAssetPath(window.location.href);
+debugger
+setAssetPath(window.location.origin+'/street-name-application');
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

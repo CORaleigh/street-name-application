@@ -25,7 +25,7 @@ function Intro() {
       </p>
       <StreetTypeList></StreetTypeList>
 
-      <strong>Have you read and agree to the above guidlines?</strong>
+      <strong>Have you read and agree to the above guidelines?</strong>
       <br />
       <br />
     </div>

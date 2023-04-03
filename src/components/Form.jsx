@@ -19,6 +19,7 @@ import SubmittedModal from "./SubmittedModal";
 import StreetTypesModal from "./StreetTypesModal";
 import StreetNameRulesModal from "./StreetNameRulesModal";
 import Streets from "./Streets";
+import StreetApprovalList from "./StreetApprovalList";
 
 function Form(props) {
   const [appFields, setAppFields] = useState([]);
@@ -36,6 +37,9 @@ function Form(props) {
 
   const attachments = useRef(null);
   const screenshotRef = useRef(null);
+  const [addStreets, useAddStreets] = useState(window.location.href.includes('/addstreets'));
+  const [cityApprove, useCityApprove] = useState(window.location.href.includes('approve'));
+  const [appId, setAppId] = useState();
   const [streetsSubmitting, setStreetsSubmitting] = useState(1);
 
   const {
@@ -66,7 +70,13 @@ function Form(props) {
   useEffect(() => {
     window.addEventListener("resize", (_) => setAppWidth(window.innerWidth));
     (async () => {
-      const fields = await getFields("155f0425df84404eb3a9b67cfcbece15");
+      let id = null;
+      if (window.location.href.includes('/addstreets/' ) || window.location.href.includes('approve')) {
+        const split = window.location.href.split('/');
+        id = split.at(split.length - 1);
+        setAppId(id);
+      }      
+      const fields = await getFields(id);
       setContactFields(
         fields.filter((f) =>
           ["contact", "organization", "email", "phone"].includes(f.name)
@@ -85,6 +95,7 @@ function Form(props) {
           ].includes(f.name)
         )
       );
+
     })();
   }, []);
   useEffect(() => {
@@ -119,7 +130,7 @@ function Form(props) {
   return (
     <div className="formDiv">
       {contactFields.length === 0 && <CalciteScrim loading></CalciteScrim>}
-      {contactFields.length > 0 && (
+      {!cityApprove && contactFields.length > 0 && (
         <CalciteStepper
           layout={appWidth <= 600 ? "vertical" : "horizontal"}
           scale="s"
@@ -154,6 +165,7 @@ function Form(props) {
                 stepped(step);
               }}
               contactFields={contactFields}
+              addStreets={addStreets}
             ></ContactInfo>
           </CalciteStepperItem>
           <CalciteStepperItem
@@ -237,6 +249,8 @@ function Form(props) {
           </CalciteStepperItem>
         </CalciteStepper>
       )}
+      {appId}
+      {cityApprove && <StreetApprovalList id={appId}></StreetApprovalList>}
       <SubmittedModal
         open={success}
         closed={() => setSuccess(false)}
