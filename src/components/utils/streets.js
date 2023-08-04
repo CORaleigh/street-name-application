@@ -114,7 +114,7 @@ export const checkStreetNames = async (value, streetTypes) => {
   }
   let containsNumber = false;
   numbers.forEach((number) => {
-    if (streetName.includes(number)) {
+    if (streetName.includes(` ${number} `) || streetName.indexOf(`${number} `) === 0) {
       containsNumber = true;
     }
   });
