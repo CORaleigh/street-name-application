@@ -11,20 +11,12 @@ const appLayer = new FeatureLayer({
 
 export const getFields = async (id) => {
   await appLayer.load();
-  let feature = null;
-  if (id) {
-    const result = await appLayer.queryFeatures({
-      where: `GlobalId = '${id}'`, outFields: ['*']
-    });
-    if (result.features.length) {
-      feature = result.features[0];
-    }
-  }
+
   
   appLayer.fields.forEach((f) => {
     f.valid = f.nullable ? true : false;
     f.reason = f.nullable ? null : "Required";
-    f.value = feature ? feature.attributes[f.name] : '';
+    f.value = '';
     if (f.name.includes("email")) {
       f.placeholder = "user@domain.com";
     }

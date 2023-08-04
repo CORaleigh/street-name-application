@@ -20,9 +20,14 @@ import "@esri/calcite-components/dist/components/calcite-modal";
 import "@esri/calcite-components/dist/components/calcite-link";
 import "@esri/calcite-components/dist/components/calcite-popover";
 import "@esri/calcite-components/dist/components/calcite-icon";
+import "@esri/calcite-components/dist/components/calcite-tabs";
+import "@esri/calcite-components/dist/components/calcite-tab-nav";
+import "@esri/calcite-components/dist/components/calcite-tab-title";
+import "@esri/calcite-components/dist/components/calcite-tab";
+
 
 import { setAssetPath } from "@esri/calcite-components/dist/components";
-debugger
+
 setAssetPath(window.location.origin+'/street-name-application');
 
 ReactDOM.createRoot(document.getElementById("root")).render(

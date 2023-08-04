@@ -79,3 +79,11 @@ calcite-input {
 .approval-list {
   height: 500px;
 }
+
+calcite-accordion-item {
+  height: 100%;
+}
+
+.approve-buttons calcite-button {
+  margin-top: 1em;
+}

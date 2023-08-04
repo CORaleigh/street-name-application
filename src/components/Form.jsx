@@ -249,7 +249,6 @@ function Form(props) {
           </CalciteStepperItem>
         </CalciteStepper>
       )}
-      {appId}
       {cityApprove && <StreetApprovalList id={appId}></StreetApprovalList>}
       <SubmittedModal
         open={success}
