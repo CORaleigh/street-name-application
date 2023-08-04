@@ -19,7 +19,7 @@ function SubmittedModal(props) {
         Application Submitted
       </div>
       <div slot="content">
-        You're applicaiton has been successfully submitted. Staff at the City of
+        Your applicaiton has been successfully submitted. Staff at the City of
         Raleigh and Wake County will review your application. Once approved, you
         will receive a copy of the application. Applications are typically
         reviewed on Thursdays. If you do not receive an email within 30 minutes,
