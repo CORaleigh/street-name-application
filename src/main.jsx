@@ -28,7 +28,7 @@ import "@esri/calcite-components/dist/components/calcite-tab";
 
 import { setAssetPath } from "@esri/calcite-components/dist/components";
 
-setAssetPath(window.location.origin+'/street-name-application');
+setAssetPath(window.location.href);
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
