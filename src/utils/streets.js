@@ -82,7 +82,7 @@ export const streetTypeChanged = async (e, i, streets) => {
     return newStreets;
   };
   export const streetNameChanged = async (e, i, streets, streetTypes) => {
-    const result = await checkStreetNames(e.target.value, streetTypes);
+    const result = await checkStreetNames(e.target.value, streetTypes, streets);
     const newStreets = streets.map((street, index) => {
       if (index === i) {
         street.name = {
@@ -96,7 +96,7 @@ export const streetTypeChanged = async (e, i, streets) => {
     return newStreets;
   };  
 
-  const checkStreetNames = async (value, streetTypes) => {
+  const checkStreetNames = async (value, streetTypes, streets) => {
     const streetName = value.toUpperCase();
     const types = streetTypes.map((type) => type.name.toUpperCase());
     if (streetName.length < 3) {
@@ -156,6 +156,15 @@ export const streetTypeChanged = async (e, i, streets) => {
     ) {
       return { valid: false, reason: "Street name is already in use" };
     }
+    if (
+      streets.find((s) => {
+        
+        return s.name?.value?.replace(" ", "") === value.replace(" ", "");
+      })
+    ) {
+      
+      return { valid: false, reason: "Cannot repeat street names" };
+    }    
     return { valid: true, reason: "" };
   };
 

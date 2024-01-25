@@ -65,7 +65,7 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
     };
     await reactiveUtils.whenOnce((_) => view.updating === true);
     await reactiveUtils.whenOnce((_) => view.updating === false);
-    success = await checkJurisdiction(feature.geometry);
+    success = await checkJurisdiction(feature?.geometry);
 
     if (success.valid) {
         feature.setAttribute("Postal", feature.getAttribute("Postal"));
