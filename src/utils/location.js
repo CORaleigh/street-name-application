@@ -3,8 +3,8 @@ import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import Map from "@arcgis/core/Map";
 import MapView from "@arcgis/core/views/MapView";
 import Search from "@arcgis/core/widgets/Search";
-import { config } from "../../public/config";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
+import { config } from "../../public/config";
 
 const parcelsLayer = new FeatureLayer({
     portalItem: {

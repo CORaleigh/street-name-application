@@ -1,4 +1,5 @@
 import { config } from "../public/config";
+
 function StreetTypeList() {
   return (
     <>

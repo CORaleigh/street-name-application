@@ -1,6 +1,6 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { config } from "../../public/config";
-
+config
 export const formLayer = new FeatureLayer({
     portalItem: {
         id: config.formLayerId,

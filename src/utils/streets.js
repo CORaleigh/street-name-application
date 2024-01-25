@@ -1,7 +1,6 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import { config } from "../../public/config";
 let streetNames = [];
-
 const streetNameDirectory = new FeatureLayer({
   portalItem: {
     id: "1e97845fd3434bf493097f9aa7390811",

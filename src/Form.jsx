@@ -13,7 +13,6 @@ import Contact from "./Contact";
 import Details from "./Details";
 import Location from "./Location";
 import Streets from "./Streets";
-import { config } from "../public/config";
 import {
   formLayer,
   getApplication,
@@ -24,6 +23,7 @@ import {
 import SubmittedModal from "./SubmittedModal";
 import Status from "./Status";
 import Approve from "./Approve";
+import { config } from "../public/config";
 
 function Form() {
   const [mode, setMode] = useState("submit");

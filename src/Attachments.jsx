@@ -2,7 +2,7 @@ import {
   CalciteButton,
   CalciteLabel,
   CalciteNotice,
-  CalciteIcon
+  CalciteIcon,
 } from "@esri/calcite-components-react";
 import { useState } from "react";
 
@@ -30,7 +30,7 @@ function Attachments(props) {
     setFiles([...[], ...[{}]]);
     const dt = new DataTransfer();
     props.attachments.current.querySelector("input").files = dt.files;
-  };  
+  };
 
   return (
     <>
