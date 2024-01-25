@@ -220,8 +220,7 @@ export const submitAdditionalStreets = async (streets, feature) => {
 
 export const changeStreetStatus = async (street, status, streets, feature) => {
     const newStreets = streets.map((s) => {
-        if (street.getAttribute('GlobalID') === s.getAttribute['GlobalID']) {
-            debugger
+        if (street.getAttribute('GlobalID') === s.getAttribute('GlobalID')) {
             if (status === 'approve' && feature.getAttribute('status') === 'City Review') {
                 s.setAttribute('status', 'City Approved');
                 s.setAttribute('cityapproved', 'Yes')
