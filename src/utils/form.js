@@ -196,7 +196,7 @@ export const submitApplication = async (location, fields, streets, screenshot, a
 }
 
 export const submitAdditionalStreets = async (streets, feature) => {
-    const guid = feature['GlobalID'];
+    const guid = feature.getAttribute('GlobalID');
     const streetnames = streets.map(street => {
         return {
             attributes: {
