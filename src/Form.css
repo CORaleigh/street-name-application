@@ -1,0 +1,118 @@
+.esri-view {
+  height: 60vh;
+  width: 100%;
+  margin-bottom: 1em !important;
+}
+calcite-notice {
+  margin-left: 0;
+}
+
+calcite-card {
+  margin: 1em;
+}
+
+calcite-fab[icon="plus"] {
+  margin: 1em;
+}
+calcite-fab[icon="minus"] {
+  right: 1em;
+}
+
+.street-row {
+  display: flex;
+  width: 100%;
+  flex: auto 1 1;
+}
+
+.street-row calcite-fab {
+  height: 3.5vh;
+  margin-top: 4vh;
+  margin-left: 1em;
+}
+
+.street-row > calcite-label:first-child {
+  flex: 2;
+  margin-right: 1em;
+}
+
+.street-row > calcite-label:last-child {
+  flex: 1;
+}
+
+.streets-container {
+  max-width: 60%;
+  margin-left: 20%;
+}
+
+calcite-meter {
+  margin-bottom: 1em;
+}
+@media only screen and (max-width: 900px) {
+  .streets-container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .street-row {
+    flex-direction: column;
+  }
+
+  .street-row > calcite-label:first-child {
+    margin-right: 0;
+  }
+  .street-row calcite-fab {
+    height: 3.5vh;
+    margin-top: 0;
+    margin-left: 0;
+  }
+  .esri-view {
+    height: 40vh;
+  }
+}
+
+.intro {
+  font-size: var(--calcite-font-size--1);
+}
+
+calcite-stepper-item {
+  width: 100%;
+}
+
+.street-notice {
+  margin-top: 1em;
+}
+
+.custom-file-upload {
+  height: 44px;
+  width: 116px;
+  z-index: 0;
+  position: absolute;
+  left: 0;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.upload {
+  margin-bottom: 1em;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.file-delete {
+  margin-top: 5px;
+}
+
+.file-name {
+  margin-top: 10px;
+  margin-left: 2em;
+  margin-right: 1em;
+}
+
+calcite-stepper {
+  margin: 1em;
+}

@@ -1,0 +1,60 @@
+calcite-list {
+  margin-top: 1em;
+}
+
+.approve-content {
+  display: flex;
+}
+.approve-content calcite-fab {
+  margin: 1em;
+  height: 1vw;
+}
+
+.approve-buttons calcite-button {
+  margin-top: 1em;
+}
+
+calcite-accordion {
+  margin-bottom: 1em;
+  margin-top: 1em;
+}
+
+calcite-notice {
+  width: 100%;
+}
+
+calcite-text-area {
+  margin: 1em;
+}
+
+calcite-chip {
+  max-width: fit-content;
+  margin-left: 0.5em;
+}
+
+.attachments {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1em;
+}
+calcite-link {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.editing-container {
+  display: flex;
+}
+.editing-container calcite-input {
+  margin-right: 1em;
+  margin-left: 1em;
+}
+
+.map-content {
+  width: 100%;
+  height: 100%;
+}
+.map-content .esri-view {
+  width: 100%;
+  height: 100%;
+}

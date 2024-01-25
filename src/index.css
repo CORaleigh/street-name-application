@@ -1,0 +1,12 @@
+@import "@esri/calcite-components/dist/calcite/calcite.css";
+@import "https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/dark/main.css";
+
+#root {
+  --calcite-ui-brand: #4d8c2b;
+  --calcite-ui-brand-hover: #4d8c2b;
+  --calcite-ui-brand-press: #4d8c2b;
+  --calcite-ui-focus-color: none !important
+
+}
+
+

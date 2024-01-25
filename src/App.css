@@ -1,0 +1,17 @@
+body {
+  background-color: var(--calcite-ui-foreground-1);
+}
+calcite-input-message[status="invalid"] {
+  color: var(--calcite-ui-danger);
+}
+calcite-input-message[status="valid"] {
+  color: var(--calcite-ui-warning);
+}
+
+.stepper-item-content {
+  font-size: var(--calcite-ui-font-size-1);
+}
+
+ol {
+  font-size: var(--calcite-font-size--1);
+}
