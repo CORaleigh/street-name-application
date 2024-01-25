@@ -44,17 +44,19 @@ function Form() {
 
   const [fields, setFields] = useState([]);
   useEffect(() => {
-    if (window.location.href.includes("/status")) {
+    const params = new URLSearchParams(window.location.search);
+    console.log(window.location)
+    const mode = params.get("mode");
+    if (mode === 'status') {
       setMode("status");
       (async () => {
-        const params = new URLSearchParams(window.location.search);
         const app = await getApplication(params.get("id"));
         console.log(app);
         setStatus(app);
         setLoading(false);
       })();
     }
-    if (window.location.href.includes("/approve")) {
+    if (mode === 'approve') {
       setMode("approve");
       formLayer.portalItem.id = config.adminFormLayerId;
       streetsTable.portalItem.id = config.adminFormLayerId;

@@ -36,10 +36,10 @@ function SubmittedModal(props) {
           Check your application status at{" "}
           <CalciteLink
             iconStart="email-address"
-            href={`http://localhost:5173/status?id=${props.id?.toLowerCase()}`}
+            href={`${window.location.origin}${window.location.pathname}?mode=status&id=${props.id?.toLowerCase()}`}
             target="_blank"
           >
-            {`http://localhost:5173/status?id=${props.id?.toLowerCase()}`}
+            {`${window.location.origin}${window.location.pathname}?mode=status&id=${props.id?.toLowerCase()}`}
           </CalciteLink>
         </p>
       </div>

@@ -23,7 +23,7 @@ function MapModal(props) {
     if (props.open && mapView) {
       setTimeout(() => {
         mapView.goTo({ target: props.feature, zoom: 16 });
-      }, 1000);
+      }, 1500);
     }
   }, [props.open]);
 
@@ -37,10 +37,11 @@ function MapModal(props) {
       }}
       fullscreen
     >
+      <div slot="header" id="modal-title">{props?.feature?.getAttribute('address')}</div>
       <div slot="content" className="map-content">
         <div ref={mapRef}></div>
       </div>
-      <CalciteButton slot="primary" onClick={(_) => props.closed()}>
+      <CalciteButton width="full" slot="primary" onClick={(_) => props.closed()}>
         Dismiss
       </CalciteButton>
     </CalciteModal>
