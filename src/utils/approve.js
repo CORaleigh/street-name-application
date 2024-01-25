@@ -61,7 +61,7 @@ export const getKind = (status) => {
     }
   }
 };
-export const getNoticeMessage = (feature) => {
+export const getNoticeMessage = (feature, approvedStreets) => {
   const needed = feature.getAttribute("streetnamesneeded");
   const status = feature.getAttribute("status");
   if (status.includes("Rejected")) {

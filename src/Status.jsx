@@ -39,7 +39,7 @@ function Status(props) {
       }
     }
   };
-  const getNoticeMessage = () => {
+  const getNoticeMessage = (feature, approvedStreets) => {
     const needed = feature.getAttribute("streetnamesneeded");
     const status = feature.getAttribute("status");
     if (status.includes("Rejected")) {
@@ -128,7 +128,7 @@ function Status(props) {
             kind={getKind(feature.getAttribute("status"))}
           >
             <div slot="title">{feature.getAttribute("status")}</div>
-            <div slot="message">{getNoticeMessage()}</div>
+            <div slot="message">{getNoticeMessage(feature, approvedStreets)}</div>
           </CalciteNotice>
           <div slot="content">Street names will be reviewed by</div>
         </CalciteCard>
@@ -137,6 +137,8 @@ function Status(props) {
         <CalciteButton
           width="full"
           onClick={() => setShowSubmitStreets((prev) => !prev)}
+          scale="l"
+          iconEnd="plus"
         >
           Submit Additional Street Names
         </CalciteButton>

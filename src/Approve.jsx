@@ -41,13 +41,11 @@ import {
   getInReviewStreets,
   canEdit,
   streetApproveDisabled,
-  approveDisabled
+  approveDisabled,
 } from "./utils/approve";
 import MapModal from "./MapModal";
 
 function Approve(props) {
-  
-
   const [streets, setStreets] = useState([]);
   const [approvedStreets, setApprovedStreets] = useState([]);
   const [inReviewStreets, setInReviewStreets] = useState([]);
@@ -126,7 +124,7 @@ function Approve(props) {
               kind={getKind(feature.getAttribute("status"))}
             >
               <div slot="title">{feature.getAttribute("status")}</div>
-              <div slot="message">{getNoticeMessage(feature)}</div>
+              <div slot="message">{getNoticeMessage(feature, approvedStreets)}</div>
             </CalciteNotice>
 
             <CalciteAccordion>
@@ -213,7 +211,11 @@ function Approve(props) {
             <CalciteButton
               iconStart="check"
               width="full"
-              disabled={approveDisabled(feature, inReviewStreets, approvedStreets)}
+              disabled={approveDisabled(
+                feature,
+                inReviewStreets,
+                approvedStreets
+              )}
               onClick={() => approveApplication(props.approve.feature, streets)}
             >
               Approve{" "}
@@ -222,7 +224,11 @@ function Approve(props) {
             <CalciteButton
               iconStart="thumbs-down"
               width="full"
-              disabled={rejectDisabled(feature, inReviewStreets, approvedStreets)}
+              disabled={rejectDisabled(
+                feature,
+                inReviewStreets,
+                approvedStreets
+              )}
               onClick={() => rejectApplication(feature, streets)}
               kind="danger"
             >
@@ -299,7 +305,10 @@ function Approve(props) {
                       <div className="approve-content" slot="content-bottom">
                         <CalciteFab
                           label="Approve"
-                          disabled={streetApproveDisabled(feature, approvedStreets)}
+                          disabled={streetApproveDisabled(
+                            feature,
+                            approvedStreets
+                          )}
                           icon="check"
                           kind="brand"
                           appearance="outline-fill"
@@ -316,7 +325,10 @@ function Approve(props) {
                         ></CalciteFab>
                         <CalciteFab
                           label="Reject"
-                          disabled={streetApproveDisabled(feature, approvedStreets)}
+                          disabled={streetApproveDisabled(
+                            feature,
+                            approvedStreets
+                          )}
                           icon="thumbs-down"
                           kind="danger"
                           appearance="outline-fill"
@@ -333,7 +345,10 @@ function Approve(props) {
                         ></CalciteFab>
                         <CalciteTextArea
                           placeholder="Enter comments..."
-                          disabled={streetApproveDisabled(feature, approvedStreets)}
+                          disabled={streetApproveDisabled(
+                            feature,
+                            approvedStreets
+                          )}
                           value={street.getAttribute("Comments")}
                           onCalciteTextAreaInput={async (e) => {
                             e.target.setAttribute("clearable", true);
