@@ -81,6 +81,7 @@ export const getNoticeMessage = (feature, approvedStreets) => {
 };
 
 export const getApprovedStreets = (feature, streets) => {
+  
   if (feature && streets) {
     const status = feature.getAttribute("status");
     return streets.filter(
@@ -94,7 +95,6 @@ export const getApprovedStreets = (feature, streets) => {
 };
 export const getRejectedStreets = (feature, streets) => {
   if (feature && streets) {
-    const status = feature.getAttribute("status");
     return streets.filter(
       (street) =>
         street.getAttribute("status") === "City Rejected" ||

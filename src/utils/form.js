@@ -1,6 +1,5 @@
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import { config } from "../../public/config";
-config
+import { config } from "../config";
 export const formLayer = new FeatureLayer({
     portalItem: {
         id: config.formLayerId,
@@ -44,7 +43,7 @@ export const getApplication = async (id) => {
         return { valid: false, message: "No ID specified", feature: null, streets: [] };
     }
 }
-export const getFields = async (id) => {
+export const getFields = async () => {
     await formLayer.load();
     let contact = {};
     if (window.localStorage.getItem('streetname_app_contact')) {
@@ -82,7 +81,7 @@ const validateEmail = (email) => {
 const validatePhone = (name) => {
     return String(name)
         .toLowerCase()
-        .match(/^\d{3}\-\d{3}\-\d{4}$/)
+        .match(/^\d{3}-\d{3}-\d{4}$/)
         ? { valid: true, reason: null }
         : { valid: false, reason: "Phone number must be in XXX-XXX-XXXX format" };
 };
@@ -147,6 +146,7 @@ export const submitApplication = async (location, fields, streets, screenshot, a
             }
         });
         const streetResult = await streetsTable.applyEdits({ addFeatures: streetnames });
+        console.log(streetResult);
         if (result?.addFeatureResults.length) {
             success = true;
         }
@@ -208,6 +208,7 @@ export const submitAdditionalStreets = async (streets, feature) => {
         }
     });
     const streetResult = await streetsTable.applyEdits({ addFeatures: streetnames });
+    console.log(streetResult);
     // const formResult = await formLayer.applyEdits({updateFeatures: [{
     //     attributes: {
     //         OBJECTID: feature.getAttribute('OBJECTID'),
@@ -260,6 +261,10 @@ export const approveApplication = async (feature, streets) => {
             street.setAttribute('notused', 'Yes');
             street.setAttribute('cityapproved', null);
             street.setAttribute('countyapproved', null);
+        } else if  (street.getAttribute('status') === 'City Rejected') {
+            street.setAttribute('cityapproved', 'No');
+            street.setAttribute('countyapproved', 'No');
+
         }
         return street;
     })

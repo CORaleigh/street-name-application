@@ -2,8 +2,10 @@
 @import "https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/dark/main.css";
 
 #root {
-  --calcite-ui-brand: #4d8c2b;
-  --calcite-ui-brand-hover: #4d8c2b;
-  --calcite-ui-brand-press: #4d8c2b;
-  --calcite-ui-focus-color: none !important;
+  --calcite-color-brand: #4d8c2b;
+  --calcite-color-brand-hover: #4d8c2b;
+  --calcite-color-brand-press: #4d8c2b;
+  --calcite-color-focus-color: none !important;
+
+  --calcite-ui-component-block-background: !important
 }

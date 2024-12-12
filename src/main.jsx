@@ -9,6 +9,8 @@ import "@esri/calcite-components/dist/components/calcite-input-message";
 
 import "@esri/calcite-components/dist/components/calcite-label";
 import "@esri/calcite-components/dist/components/calcite-block";
+import "@esri/calcite-components/dist/components/calcite-block-section";
+
 import "@esri/calcite-components/dist/components/calcite-panel";
 import "@esri/calcite-components/dist/components/calcite-stepper";
 import "@esri/calcite-components/dist/components/calcite-stepper-item";
@@ -18,7 +20,7 @@ import "@esri/calcite-components/dist/components/calcite-option";
 import "@esri/calcite-components/dist/components/calcite-button";
 import "@esri/calcite-components/dist/components/calcite-scrim";
 import "@esri/calcite-components/dist/components/calcite-notice";
-import "@esri/calcite-components/dist/components/calcite-modal";
+import "@esri/calcite-components/dist/components/calcite-dialog";
 import "@esri/calcite-components/dist/components/calcite-link";
 import "@esri/calcite-components/dist/components/calcite-popover";
 import "@esri/calcite-components/dist/components/calcite-icon";

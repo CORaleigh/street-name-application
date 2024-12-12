@@ -4,7 +4,7 @@ import Map from "@arcgis/core/Map";
 import MapView from "@arcgis/core/views/MapView";
 import Search from "@arcgis/core/widgets/Search";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
-import { config } from "../../public/config";
+import { config } from "../config";
 
 const parcelsLayer = new FeatureLayer({
     portalItem: {
@@ -13,7 +13,7 @@ const parcelsLayer = new FeatureLayer({
     layerId: 0,
     outFields: ["PIN_NUM", "SITE_ADDRESS"]
 });
-export const loadMap = async (container, setLocationFound) => {
+export const loadMap = async (container) => {
     const map = new Map({
         basemap: {
             portalItem: {
@@ -49,12 +49,24 @@ export const loadSearch = (view) => {
                 resultSymbol: {
                     type: "picture-marker",
                     url: "./assets/pin.svg",
-                    height: 36,
-                    width: 36,
+                    height: 24,
+                    width: 24,
+                    yoffset: 12
                 },
             },
         ],
     });
+}
+
+export const addPin = (feature, view) => {
+    feature.symbol = {
+        type: "picture-marker",
+        url: "./assets/pin.svg",
+        height: 24,
+        width: 24,
+        yoffset: 12
+    };
+    view.graphics.add(feature);
 }
 
 export const searchComplete = async (e, view, setLocationFound, screenshotSet, locationSet) => {
@@ -63,8 +75,8 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
         valid: false,
         reason: `Location not set, search by address in the upper right corner of the map`,
     };
-    await reactiveUtils.whenOnce((_) => view.updating === true);
-    await reactiveUtils.whenOnce((_) => view.updating === false);
+    await reactiveUtils.whenOnce(() => view.updating === true);
+    await reactiveUtils.whenOnce(() => view.updating === false);
     success = await checkJurisdiction(feature?.geometry);
 
     if (success.valid) {
@@ -80,8 +92,11 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
             );
 
             locationSet(feature);
+            setTimeout(async () => {
             const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
             screenshotSet(screenshot);
+            }, 1000
+            )
             success = {
                 valid: true,
                 reason: `Location set to ${feature.getAttribute("address")}`,
@@ -100,6 +115,9 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
 }
 
 const checkJurisdiction = async (geometry) => {
+    if (!geometry) {
+        return {}
+    }
     const layer = new FeatureLayer({
         url: "https://maps.wakegov.com/arcgis/rest/services/Jurisdictions/Jurisdictions/MapServer/1",
     });
