@@ -6,10 +6,10 @@ import {
 import PropTypes from "prop-types";
 import { useEffect } from "react";
 
-function SubmittedModal({open, closed, id}) {
+function SubmittedModal({ open, closed, id }) {
   useEffect(() => {
-    console.log(open)
-  },[open])
+    console.log(open);
+  }, [open]);
   return (
     <CalciteDialog
       heading="Application Submitted"
@@ -21,30 +21,33 @@ function SubmittedModal({open, closed, id}) {
         closed();
       }}
     >
-
-        Your applicaiton has been successfully submitted. Staff at the City of
-        Raleigh and Wake County will review your application. Once approved, you
-        will receive a copy of the application. Applications are typically
-        reviewed on Thursdays. If you do not receive an email within 30 minutes,
-        please email us at{" "}
+      Your applicaiton has been successfully submitted. Staff at the City of
+      Raleigh and Wake County will review your application. Once approved, you
+      will receive a copy of the application. Applications are typically
+      reviewed on Thursdays. If you do not receive an email within 30 minutes,
+      please email us at{" "}
+      <CalciteLink
+        iconStart="email-address"
+        href="mailto:RaleighAddressing@raleighnc.gov"
+        target="_blank"
+      >
+        RaleighAddressing@raleighnc.gov
+      </CalciteLink>
+      .
+      <p>
+        Check your application status at{" "}
         <CalciteLink
           iconStart="email-address"
-          href="mailto:RaleighAddressing@raleighnc.gov"
+          href={`${window.location.origin}${
+            window.location.pathname
+          }?mode=status&id=${id?.toLowerCase()}`}
           target="_blank"
         >
-          RaleighAddressing@raleighnc.gov
+          {`${window.location.origin}${
+            window.location.pathname
+          }?mode=status&id=${id?.toLowerCase()}`}
         </CalciteLink>
-        .
-        <p>
-          Check your application status at{" "}
-          <CalciteLink
-            iconStart="email-address"
-            href={`${window.location.origin}${window.location.pathname}?mode=status&id=${id?.toLowerCase()}`}
-            target="_blank"
-          >
-            {`${window.location.origin}${window.location.pathname}?mode=status&id=${id?.toLowerCase()}`}
-          </CalciteLink>
-        </p>
+      </p>
       <CalciteButton slot="footer-end" onClick={() => closed()}>
         Dismiss
       </CalciteButton>
@@ -54,8 +57,6 @@ function SubmittedModal({open, closed, id}) {
 SubmittedModal.propTypes = {
   open: PropTypes.bool.isRequired,
   closed: PropTypes.func,
-  id: PropTypes.any
-
-
+  id: PropTypes.any,
 };
 export default SubmittedModal;

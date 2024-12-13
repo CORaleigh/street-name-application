@@ -9,16 +9,29 @@ import {
   CalciteSelect,
   CalciteNotice,
   CalciteAction,
+  CalcitePanel,
 } from "@esri/calcite-components-react";
 
 import PropTypes from "prop-types";
 import { useStreets } from "./useStreets";
 
-function Streets({needed, submit}) {
-  const { streets, streetTypes, addStreet, deleteStreet, getAlertMessage, getAlertKind, handleSubmitClick, handleStreetNameInput, handleStreetTypeSelect } = useStreets(needed, submit);
+function Streets({ needed, submit, nextStep }) {
+  const {
+    streets,
+    streetTypes,
+    addStreet,
+    deleteStreet,
+    getAlertMessage,
+    getAlertKind,
+    handleSubmitClick,
+    handleStreetNameInput,
+    handleStreetTypeSelect,
+  } = useStreets(needed, submit);
 
   return (
     <>
+        <CalcitePanel>
+    
       <div className="streets-container">
         {streets.map((street, i) => (
           <CalciteCard key={i + 1}>
@@ -89,9 +102,27 @@ function Streets({needed, submit}) {
           appearance="outline-fill"
           onClick={addStreet}
         ></CalciteFab>
+        <CalciteNotice className="street-notice" kind={getAlertKind()} open>
+          <div slot="message">{getAlertMessage()}</div>
+        </CalciteNotice>
 
-        <CalciteButton
+
+
+      </div>
+      <CalciteButton
+        appearance="outline"
+        slot="footer-start"
+        width="full"
+        onClick={() => nextStep("Project Details")}
+        iconStart="arrow-left"
+        scale="l"
+      >
+        Back
+      </CalciteButton>      
+      <CalciteButton
+          slot="footer-end"
           width="full"
+          scale="l"
           onClick={handleSubmitClick}
           disabled={
             streets.filter((s) => s.name.valid && s.type.valid).length >=
@@ -103,17 +134,13 @@ function Streets({needed, submit}) {
         >
           Submit
         </CalciteButton>
-
-        <CalciteNotice className="street-notice" kind={getAlertKind()} open>
-          <div slot="message">{getAlertMessage()}</div>
-        </CalciteNotice>
-      </div>
+      </CalcitePanel>
     </>
   );
 }
 Streets.propTypes = {
   needed: PropTypes.any,
-  submit: PropTypes.func
-
+  submit: PropTypes.func,
+  nextStep: PropTypes.func
 };
 export default Streets;

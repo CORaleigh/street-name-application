@@ -3,13 +3,14 @@ import {
   CalciteInput,
   CalciteInputMessage,
   CalciteLabel,
+  CalcitePanel,
 } from "@esri/calcite-components-react";
 import { inputChanged } from "../../utils/form";
 import PropTypes from "prop-types";
 
-function Contact({fields, updated, nextStep}) {
+function Contact({ fields, updated, nextStep }) {
   return (
-    <>
+    <CalcitePanel>
       {fields.map((f, i) => (
         <CalciteLabel scale="l" key={`${f.name}_${i}`}>
           {f.alias}
@@ -35,28 +36,36 @@ function Contact({fields, updated, nextStep}) {
           )}
         </CalciteLabel>
       ))}
-
       <CalciteButton
+        appearance="outline"
+        slot="footer-start"
+        width="full"
+        onClick={() => nextStep("Instructions")}
+        iconStart="arrow-left"
+        scale="l"
+      >
+        Back
+      </CalciteButton>
+      <CalciteButton
+        width="full"
+        slot="footer-end"
         onClick={() => nextStep("Project Location")}
         disabled={
-          fields.filter((f) => f.valid === false).length
-            ? true
-            : undefined
+          fields.filter((f) => f.valid === false).length ? true : undefined
         }
         iconEnd="arrow-right"
         scale="l"
       >
         Next
       </CalciteButton>
-    </>
+    </CalcitePanel>
   );
 }
 
 Contact.propTypes = {
-  fields: PropTypes.any, // Replace `any` with the actual type if known
+  fields: PropTypes.any,
   updated: PropTypes.any,
   nextStep: PropTypes.any,
-
 };
 
 export default Contact;

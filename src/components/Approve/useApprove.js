@@ -128,7 +128,7 @@ const [streets, setStreets] = useState([]);
         setCreds(creds?.creds);
         setCityOrCounty(
           creds?.user.username.toLowerCase().includes("raleigh")
-            ? "county"
+            ? "city"
             : creds.username.toLowerCase().includes("wake") 
             ? "county"
             : undefined

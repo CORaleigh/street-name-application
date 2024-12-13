@@ -81,7 +81,7 @@ export const getNoticeMessage = (feature, approvedStreets) => {
 };
 
 export const getApprovedStreets = (feature, streets) => {
-  
+
   if (feature && streets) {
     const status = feature.getAttribute("status");
     return streets.filter(

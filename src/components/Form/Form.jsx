@@ -20,7 +20,29 @@ import { config } from "../../../public/config";
 import { useForm } from "./useForm";
 
 function Form() {
-  const {mode, fields,  attachments, screenshotRef, selectedStep, handleNextStep, layout, agreed, handleAgreed, location, setLocation, handleScreenshotSet, loading, status, approve, id, submit, success, handleSubmittedModalClosed, handleFieldsUpdated, handleStepperChanged} = useForm(config);
+  const {
+    mode,
+    fields,
+    attachments,
+    screenshotRef,
+    selectedStep,
+    handleNextStep,
+    layout,
+    agreed,
+    handleAgreed,
+    location,
+    setLocation,
+    handleScreenshotSet,
+    loading,
+    status,
+    approve,
+    id,
+    submit,
+    success,
+    handleSubmittedModalClosed,
+    handleFieldsUpdated,
+    handleStepperChanged,
+  } = useForm(config);
   return (
     <>
       {loading && <CalciteScrim loading></CalciteScrim>}
@@ -33,7 +55,6 @@ function Form() {
           ></CalciteNavigationLogo>
         </CalciteNavigation>
         {mode === "submit" && (
-          
           <CalciteStepper
             scale="s"
             layout={layout}
@@ -114,6 +135,7 @@ function Form() {
                   fields.find((f) => f.name === "streetnamesneeded") &&
                   fields.find((f) => f.name === "streetnamesneeded").value
                 }
+                nextStep={handleNextStep}
               ></Streets>
             </CalciteStepperItem>
           </CalciteStepper>

@@ -1,13 +1,11 @@
-import {
-  CalciteButton,
-  CalciteDialog,
-} from "@esri/calcite-components-react";
+import { CalciteButton, CalciteDialog } from "@esri/calcite-components-react";
 import PropTypes from "prop-types";
 import { useMapModal } from "./useMapModal";
-
-function MapModal({closed, open, feature}) {
+import { ArcgisMap } from "@arcgis/map-components-react";
+import { config } from "../../config";
+import { handleViewReady } from "../../utils/location";
+function MapModal({ closed, open, feature }) {
   const { mapRef } = useMapModal(closed, open, feature);
-
   return (
     <CalciteDialog
       modal
@@ -18,11 +16,9 @@ function MapModal({closed, open, feature}) {
         closed();
       }}
       fullscreen
-      heading={feature?.getAttribute('address')}
+      heading={feature?.getAttribute("address")}
     >
-      {/* <div slot="content" className="map-content"> */}
-        <div ref={mapRef}></div>
-      {/* </div> */}
+      <ArcgisMap ref={mapRef} itemId={config.webMapId} onArcgisViewReadyChange={handleViewReady}></ArcgisMap>
       <CalciteButton width="full" slot="primary" onClick={() => closed()}>
         Dismiss
       </CalciteButton>
@@ -30,7 +26,7 @@ function MapModal({closed, open, feature}) {
   );
 }
 MapModal.propTypes = {
-  closed: PropTypes.func, // Replace `any` with the actual type if known
+  closed: PropTypes.func,
   feature: PropTypes.any,
   open: PropTypes.any,
 };

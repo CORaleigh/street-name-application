@@ -261,7 +261,7 @@ export const approveApplication = async (feature, streets) => {
             street.setAttribute('notused', 'Yes');
             street.setAttribute('cityapproved', null);
             street.setAttribute('countyapproved', null);
-        } else if  (street.getAttribute('status') === 'City Rejected') {
+        } else if (street.getAttribute('status') === 'City Rejected') {
             street.setAttribute('cityapproved', 'No');
             street.setAttribute('countyapproved', 'No');
 

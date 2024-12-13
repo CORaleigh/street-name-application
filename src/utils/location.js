@@ -1,8 +1,5 @@
 
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
-import Map from "@arcgis/core/Map";
-import MapView from "@arcgis/core/views/MapView";
-import Search from "@arcgis/core/widgets/Search";
 import * as reactiveUtils from "@arcgis/core/core/reactiveUtils.js";
 import { config } from "../config";
 
@@ -11,52 +8,33 @@ const parcelsLayer = new FeatureLayer({
         id: config.parcelsLayerId,
     },
     layerId: 0,
-    outFields: ["PIN_NUM", "SITE_ADDRESS"]
+    outFields: ["PIN_NUM", "SITE_ADDRESS"],
+    popupEnabled: false
 });
-export const loadMap = async (container) => {
-    const map = new Map({
-        basemap: {
-            portalItem: {
-                id: "109c9fa256a44e28a29a528ca18637e0",
-            },
-        },
-    });
-    const view = new MapView({
-        map: map,
-        container: container,
-        zoom: 10,
-        center: [-78.6382, 35.7796],
-        popupEnabled: false
-    });
 
-    view.map.add(parcelsLayer);
-    await view.when();
-    return view;
+export const searchSources = [
+{
+    url: config.geocodeUrl,
+    singleLineFieldName: "SingleLine",
+    outFields: ["*"],
+    placeholder: "Search by address",
+    zoomScale: 4800,
+    popupEnabled: false,
+    resultSymbol: {
+        type: "picture-marker",
+        url: "./assets/pin.svg",
+        height: 24,
+        width: 24,
+        yoffset: 12
+    },
+},
+]
+
+export const handleViewReady = (e) => {
+    e.target.view.map.add(parcelsLayer);
 }
 
-export const loadSearch = (view) => {
-    return new Search({
-        view: view,
-        includeDefaultSources: false,
-        sources: [
-            {
-                url: config.geocodeUrl,
-                singleLineFieldName: "SingleLine",
-                outFields: ["*"],
-                placeholder: "Search by address",
-                zoomScale: 4800,
-                popupEnabled: false,
-                resultSymbol: {
-                    type: "picture-marker",
-                    url: "./assets/pin.svg",
-                    height: 24,
-                    width: 24,
-                    yoffset: 12
-                },
-            },
-        ],
-    });
-}
+
 
 export const addPin = (feature, view) => {
     feature.symbol = {
@@ -68,6 +46,8 @@ export const addPin = (feature, view) => {
     };
     view.graphics.add(feature);
 }
+
+
 
 export const searchComplete = async (e, view, setLocationFound, screenshotSet, locationSet) => {
     const feature = e.results[0].results[0]?.feature;
@@ -93,8 +73,8 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
 
             locationSet(feature);
             setTimeout(async () => {
-            const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
-            screenshotSet(screenshot);
+                const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
+                screenshotSet(screenshot);
             }, 1000
             )
             success = {
@@ -114,7 +94,15 @@ export const searchComplete = async (e, view, setLocationFound, screenshotSet, l
 
 }
 
-const checkJurisdiction = async (geometry) => {
+export const checkParcel = async (feature, view) => {
+    await reactiveUtils.whenOnce(() => view.updating === true);
+    await reactiveUtils.whenOnce(() => view.updating === false);    
+    return await view.hitTest(view.toScreen(feature.geometry), {
+        include: [parcelsLayer],
+    });
+}
+
+export const checkJurisdiction = async (geometry) => {
     if (!geometry) {
         return {}
     }
@@ -131,7 +119,8 @@ const checkJurisdiction = async (geometry) => {
         return {
             valid: false,
             reason:
-                "Property not located inside the City of Raleigh, please submit through Wake County",
+                "Property not located in Wake County, please submit through Wake County at the website below",
+            link: config.wakeCountySite
         };
     }
     if (result.features[0].getAttribute("JURISDICTION") !== "RALEIGH") {
@@ -139,7 +128,8 @@ const checkJurisdiction = async (geometry) => {
             valid: false,
             reason: `Property is located in ${result.features[0].getAttribute(
                 "JURISDICTION"
-            )} please check their website`,
+            ).toLowerCase().replace(/\b\w/g, char => char.toUpperCase())} please check Wake County's website`,
+            link: config.wakeCountySite
         };
     }
     return {

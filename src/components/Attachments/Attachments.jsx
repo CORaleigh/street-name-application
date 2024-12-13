@@ -7,10 +7,9 @@ import {
 import PropTypes from "prop-types";
 import { useAttachments } from "./useAttachments";
 
-
-function Attachments({attachments, screenshotRef}) {
-  const { files, fileChanged, removeFile, fileLimit } = useAttachments(attachments);
-
+function Attachments({ attachments, screenshotRef }) {
+  const { files, fileChanged, removeFile, fileLimit } =
+    useAttachments(attachments);
 
   return (
     <>
@@ -26,7 +25,6 @@ function Attachments({attachments, screenshotRef}) {
                     accept="application/pdf"
                     type="file"
                     name="attachment"
-                    capture="environment"
                     className="custom-file-upload"
                     onChange={(e) => {
                       fileChanged(e, i);
@@ -85,7 +83,7 @@ function Attachments({attachments, screenshotRef}) {
   );
 }
 Attachments.propTypes = {
-  attachments: PropTypes.any, // Replace `any` with the actual type if known
+  attachments: PropTypes.any,
   screenshotRef: PropTypes.any,
 };
 

@@ -1,39 +1,56 @@
-import { useEffect, useState, useRef } from "react";
-import { loadMap, loadSearch, searchComplete } from "../../utils/location";
+import { useState, useRef } from "react";
+import { checkJurisdiction, checkParcel } from "../../utils/location";
 
 export const useLocation = (screenshotSet, locationSet, nextStep) => {
 
   const mapRef = useRef(null);
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const searchRef = useRef(null);
+
   const [locationFound, setLocationFound] = useState({
     valid: false,
     reason:
       "Location not set, search by address in the upper right corner of the map",
   });
   const handleNextClick = () => nextStep("Project Details");
-  useEffect(() => {
-    (async () => {
-      if (!mapLoaded) {
+  const handleViewClick = (e) => {
 
-        const view = await loadMap(mapRef.current);
-        setMapLoaded(true);
-        const search = await loadSearch(view);
-        view.ui.add(search, "top-right");
-        view.on("click", (e) => {
-          search.search(e.mapPoint);
-        });
-        search.on("search-complete", (e) =>
-          searchComplete(
-            e,
-            view,
-            setLocationFound,
-            screenshotSet,
-            locationSet
-          )
+    searchRef.current.search(e.detail.mapPoint);
+  }
+  const handleSearchComplete = async (e) => {
+    const view = e.target.view
+    const feature = e.detail.results[0].results[0]?.feature;
+    feature.setAttribute("Postal", feature.getAttribute("Postal"));
+    feature.setAttribute("address", feature.getAttribute("ShortLabel"));
+    let success = await checkJurisdiction(feature?.geometry);
+    if (success.valid) {
+      let hitTest = await checkParcel(feature, view);
+      if (hitTest.results.length) {
+        feature.setAttribute(
+          "pinnum",
+          hitTest.results[0].graphic.getAttribute("PIN_NUM")
         );
+
+        locationSet(feature);
+        setTimeout(async () => {
+          const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
+          screenshotSet(screenshot);
+        }, 1000
+        )
+        success = {
+          valid: true,
+          reason: `Location set to ${feature.getAttribute("address")}`,
+        };
+      } else {
+        success = {
+          valid: false,
+          reason: "Address not located on a property",
+        };
+        locationSet(undefined);
       }
-    })();
-  }, []);
-  return { mapRef, mapLoaded, locationFound, handleNextClick };
+
+    }
+    setLocationFound(success);
+  }
+  return { mapRef, searchRef, locationFound, handleNextClick, handleSearchComplete, handleViewClick };
 
 }

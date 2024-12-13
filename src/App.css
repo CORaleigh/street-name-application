@@ -16,3 +16,23 @@ ol {
   font-size: var(--calcite-font-size--1);
 }
 
+
+calcite-panel p {
+  margin-left: 14px;
+  margin-right: 14px;
+
+}
+
+calcite-panel calcite-label:first-child {
+  margin-top: 14px;
+}
+
+calcite-panel calcite-label {
+  margin-left: 14px;
+  margin-right: 14px;
+
+}
+
+calcite-panel calcite-notice {
+  margin-bottom: 14px;
+}
