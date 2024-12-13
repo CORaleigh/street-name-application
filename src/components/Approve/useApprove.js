@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
 
 
-  import { checkAuthentication } from "../../utils/authenticate";
-  import { loadStreetTypes, streetCommentChanged } from "../../utils/streets";
-  import {
-    approveApplication,
-    rejectApplication,
-    changeStreetStatus
-  } from "../../utils/form";
-  import {
-    getApprovedStreets,
-    getRejectedStreets,
-    getInReviewStreets,
-    updateInReviewStreetName,
-    updateInReviewStreetType,
-    toggleEditing
-  } from "../../utils/approve";
+import { checkAuthentication } from "../../utils/authenticate";
+import { loadStreetTypes, streetCommentChanged } from "../../utils/streets";
+import {
+  approveApplication,
+  rejectApplication,
+  changeStreetStatus
+} from "../../utils/form";
+import {
+  getApprovedStreets,
+  getRejectedStreets,
+  getInReviewStreets,
+  updateInReviewStreetName,
+  updateInReviewStreetType,
+  toggleEditing
+} from "../../utils/approve";
 
 export const useApprove = (approve) => {
 
 
-const [streets, setStreets] = useState([]);
+  const [streets, setStreets] = useState([]);
   const [approvedStreets, setApprovedStreets] = useState([]);
   const [inReviewStreets, setInReviewStreets] = useState([]);
   const [rejectedStreets, setRejectedStreets] = useState([]);
@@ -34,7 +34,7 @@ const [streets, setStreets] = useState([]);
 
   const handleApproveClicked = () => approveApplication(approve.feature, streets)
   const handleRejectClicked = () => rejectApplication(feature, streets)
-  const handleStreetNameInputed = async (e, street) => 
+  const handleStreetNameInputed = async (e, street) =>
     setStreets(
       await updateInReviewStreetName(
         e,
@@ -42,16 +42,16 @@ const [streets, setStreets] = useState([]);
         streets
       )
     );
-  
+
   const handleStreetTypeSelected = async (e, street) => setStreets(
-      await updateInReviewStreetType(
-        e,
-        street,
-        streets
-      )
+    await updateInReviewStreetType(
+      e,
+      street,
+      streets
     )
-  
-  const handleStreetApprovedClicked = async (street) => 
+  )
+
+  const handleStreetApprovedClicked = async (street) =>
     setStreets(
       await changeStreetStatus(
         street,
@@ -60,41 +60,41 @@ const [streets, setStreets] = useState([]);
         feature
       )
     )
-  
-  const handleStreetRejectedClicked = async (street) => 
+
+  const handleStreetRejectedClicked = async (street) =>
     setStreets(
-        await changeStreetStatus(
-          street,
-          "reject",
-          streets,
-          feature
-        )
+      await changeStreetStatus(
+        street,
+        "reject",
+        streets,
+        feature
       )
-  
-  const handleStreetEditClicked = async (street) => setStreets(await toggleEditing(street, streets))   
-  
+    )
+
+  const handleStreetEditClicked = async (street) => setStreets(await toggleEditing(street, streets))
+
   const handleStreetCommentEntered = async (e, street) => {
-        e.target.setAttribute("clearable", true);
-        setStreets(
-          await streetCommentChanged(
-            e,
-            street,
-            streets
-          )
-        );
-      }
-  
+    e.target.setAttribute("clearable", true);
+    setStreets(
+      await streetCommentChanged(
+        e,
+        street,
+        streets
+      )
+    );
+  }
+
 
 
   const handleSendBackToReview = async (street) => setStreets(
-        await changeStreetStatus(
-          street,
-          "review",
-          streets,
-          feature
-        )
-      )
-  
+    await changeStreetStatus(
+      street,
+      "review",
+      streets,
+      feature
+    )
+  )
+
 
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const [streets, setStreets] = useState([]);
 
   useEffect(() => {
     if (streets) {
-      
+
       setApprovedStreets(getApprovedStreets(approve?.feature, streets));
       setRejectedStreets(getRejectedStreets(approve?.feature, streets));
       setInReviewStreets(getInReviewStreets(approve?.feature, streets));
@@ -129,9 +129,9 @@ const [streets, setStreets] = useState([]);
         setCityOrCounty(
           creds?.user.username.toLowerCase().includes("raleigh")
             ? "city"
-            : creds.username.toLowerCase().includes("wake") 
-            ? "county"
-            : undefined
+            : creds.username.toLowerCase().includes("wake")
+              ? "county"
+              : undefined
         );
       })();
     }
@@ -139,7 +139,7 @@ const [streets, setStreets] = useState([]);
       setStreetTypes([...streetTypes, ...(await loadStreetTypes())]);
     })();
   }, []);
-  return {streetTypes, approvedStreets, inReviewStreets, rejectedStreets, feature, attachments, cityOrCounty, user, creds, showMap, setShowMap, handleApproveClicked, handleRejectClicked, handleStreetNameInputed, handleStreetTypeSelected, handleStreetApprovedClicked, handleStreetRejectedClicked, handleStreetEditClicked, handleStreetCommentEntered, handleSendBackToReview }
+  return { streetTypes, approvedStreets, inReviewStreets, rejectedStreets, feature, attachments, cityOrCounty, user, creds, showMap, setShowMap, handleApproveClicked, handleRejectClicked, handleStreetNameInputed, handleStreetTypeSelected, handleStreetApprovedClicked, handleStreetRejectedClicked, handleStreetEditClicked, handleStreetCommentEntered, handleSendBackToReview }
 }
 
 

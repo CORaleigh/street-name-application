@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { checkJurisdiction, checkParcel } from "../../utils/location";
+import * as reactiveUtils from "@arcgis/core/core/reactiveUtils";
 
 export const useLocation = (screenshotSet, locationSet, nextStep) => {
 
@@ -31,11 +32,10 @@ export const useLocation = (screenshotSet, locationSet, nextStep) => {
         );
 
         locationSet(feature);
-        setTimeout(async () => {
+          await reactiveUtils.whenOnce(() => view.updating === false );
           const screenshot = await view.takeScreenshot({ width: 1048, height: 586 });
           screenshotSet(screenshot);
-        }, 1000
-        )
+
         success = {
           valid: true,
           reason: `Location set to ${feature.getAttribute("address")}`,
